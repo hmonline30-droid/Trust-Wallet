@@ -16,6 +16,16 @@ import {
   trackPaymentHandler,
 } from './services/realtimePayments.js';
 import { getPricesHandler } from './services/realtimePrices.js';
+import {
+  adminCreditWalletHandler,
+  adminResetWalletHandler,
+  getAdminOverviewHandler,
+  getAdminStatusHandler,
+  loginAdminHandler,
+  logoutAdminHandler,
+  requireAdminAuth,
+  setupAdminHandler,
+} from './services/adminAuth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,10 +42,19 @@ async function startServer() {
     return next(err);
   });
 
+  // Admin Authentication & Protected Admin Routes
+  app.get('/api/admin/status', getAdminStatusHandler);
+  app.post('/api/admin/setup', setupAdminHandler);
+  app.post('/api/admin/login', loginAdminHandler);
+  app.post('/api/admin/logout', logoutAdminHandler);
+  app.get('/api/admin/overview', requireAdminAuth, getAdminOverviewHandler);
+  app.post('/api/admin/wallet-credit', requireAdminAuth, adminCreditWalletHandler);
+  app.post('/api/admin/wallet-reset', requireAdminAuth, adminResetWalletHandler);
+
   // Multi-chain Web3 Exchange Wallet API Routes
   app.get('/api/chains', getChains);
   app.post('/api/deposit/verify', verifyDeposit);
-  app.post('/api/withdraw', withdrawFunds);
+  app.post('/api/withdraw', requireAdminAuth, withdrawFunds);
   app.post('/api/validate-address', validateChainAddress);
   app.get('/api/payments', getPaymentsHandler);
   app.post('/api/payments/refresh', refreshPaymentsHandler);

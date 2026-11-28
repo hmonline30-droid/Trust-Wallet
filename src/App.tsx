@@ -6,12 +6,14 @@ import {
   Repeat2,
   Search,
   Settings,
+  ShieldCheck,
   Sprout,
   TrendingUp,
   X,
 } from 'lucide-react';
 import {
   ActiveModal,
+  AdminSession,
   BottomNavTab,
   ConnectedDapp,
   HomeSubTab,
@@ -61,6 +63,8 @@ export default function App() {
   const [isMinimized, setIsMinimized] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [focusedTx, setFocusedTx] = useState<WalletTransaction | null>(null);
+  const [adminToken, setAdminToken] = useState<string | null>(null);
+  const [adminSession, setAdminSession] = useState<AdminSession | null>(null);
   const creditedServerKeysRef = useRef<Set<string>>(new Set());
   const tokensRef = useRef<TokenAsset[]>(TOKENS);
   tokensRef.current = tokens;
@@ -78,6 +82,14 @@ export default function App() {
       setToastMessage((prev) => (prev === msg ? null : prev));
     }, 2600);
   }, []);
+
+  const handleAdminAuthChange = useCallback(
+    (token: string | null, session: AdminSession | null) => {
+      setAdminToken(token);
+      setAdminSession(session);
+    },
+    []
+  );
 
   const resolveTokenIdForPayment = useCallback((payment: RealtimePaymentPayload) => {
     const currentTokens = tokensRef.current;
@@ -257,7 +269,8 @@ export default function App() {
     tokenId: string,
     amount: number,
     source: 'receive' | 'deposit' | 'buy',
-    label: string
+    label: string,
+    customMeta?: { txHash?: string; counterparty?: string }
   ) => {
     const token = tokens.find((t) => t.id === tokenId);
     if (!token || amount <= 0) return;
@@ -294,8 +307,10 @@ export default function App() {
         timestamp: 'Just now',
         network: token.network,
         status: 'Confirmed',
-        txHash: `0x${Date.now().toString(16)}a4f92c81d7e3b605219c8e4a7f2d0b91c8e3a7`,
-        counterparty: activeAccount.addresses[token.network],
+        txHash:
+          customMeta?.txHash ||
+          `0x${Date.now().toString(16)}a4f92c81d7e3b605219c8e4a7f2d0b91c8e3a7`,
+        counterparty: customMeta?.counterparty || activeAccount.addresses[token.network],
         feeText: '0.0008 ETH ($2.55)',
       },
       ...prev,
@@ -482,11 +497,11 @@ export default function App() {
 
   const handleResetEmpty = () => {
     setAccounts((prev) =>
-      prev.map((acc) =>
-        acc.id === activeAccount.id ? { ...acc, balances: {} } : acc
-      )
+      prev.map((acc) => ({ ...acc, balances: {} }))
     );
-    showToast(`${activeAccount.name} reset to empty`);
+    setTransactions([]);
+    creditedServerKeysRef.current.clear();
+    showToast('All funds and history reset to zero');
   };
 
   const handleDeleteAccount = (accountId: string) => {
@@ -692,6 +707,20 @@ export default function App() {
                 >
                   <Settings className="w-[17px] h-[17px]" strokeWidth={2} />
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveModal('admin')}
+                  title={adminSession ? 'Admin Console (Signed In)' : 'Admin Login'}
+                  aria-label="Admin Login"
+                  className={`w-[34px] h-[34px] rounded-full flex items-center justify-center transition-colors ${
+                    adminSession
+                      ? 'bg-[#ECFDF5] text-[#16A34A] border border-[#A7F3D0]'
+                      : 'bg-[#EFEFF2] hover:bg-[#E4E5EA] text-[#141416]'
+                  }`}
+                >
+                  <ShieldCheck className="w-[17px] h-[17px]" strokeWidth={2} />
+                </button>
               </div>
             </div>
 
@@ -891,6 +920,10 @@ export default function App() {
               preselectedBuyTokenId={preselectedBuyTokenId}
               currency={currency}
               onChangeCurrency={setCurrency}
+              adminToken={adminToken}
+              adminSession={adminSession}
+              onAdminAuthChange={handleAdminAuthChange}
+              onNotify={showToast}
             />
           </main>
         )}
@@ -916,6 +949,11 @@ export default function App() {
           }}
           onFundStarterPack={handleFundStarterPack}
           onResetEmpty={handleResetEmpty}
+          adminToken={adminToken}
+          adminSession={adminSession}
+          onAdminAuthChange={handleAdminAuthChange}
+          onCreditAsset={handleCreditAsset}
+          onNotify={showToast}
         />
       </div>
       <OfflineIndicator />

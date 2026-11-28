@@ -22,15 +22,18 @@ import {
 } from 'lucide-react';
 import {
   ActiveModal,
+  AdminSession,
   ConnectedDapp,
   NetworkId,
   TokenAsset,
   WalletAccount,
   WalletTransaction,
 } from '../../types/wallet';
+import QRCode from 'qrcode';
 import { NETWORKS } from '../../data/walletData';
 import { BinanceIcon, NetworkLogoIcon, TokenBadgeIcon } from '../icons/TrustIcons';
 import { PWAInstallButton } from '../PWAInstallButton';
+import { AdminPanel } from '../AdminPanel';
 
 interface WalletModalsProps {
   activeModal: ActiveModal;
@@ -67,61 +70,58 @@ interface WalletModalsProps {
     tokenId: string,
     amount: number,
     source: 'receive' | 'deposit' | 'buy',
-    label: string
+    label: string,
+    customMeta?: { txHash?: string; counterparty?: string }
   ) => void;
   onSendAsset: (tokenId: string, amount: number, recipient: string) => void;
   preselectedBuyTokenId: string;
   currency: 'USD' | 'EUR';
   onChangeCurrency: (curr: 'USD' | 'EUR') => void;
+  adminToken: string | null;
+  adminSession: AdminSession | null;
+  onAdminAuthChange: (token: string | null, session: AdminSession | null) => void;
+  onNotify?: (msg: string) => void;
 }
 
 function QrMatrixSvg({ seed }: { seed: string }) {
-  const cells = useMemo(() => {
-    const size = 21;
-    const grid: boolean[] = [];
-    let hash = 2166136261;
-    for (let i = 0; i < seed.length; i++) {
-      hash ^= seed.charCodeAt(i);
-      hash = Math.imul(hash, 16777619);
-    }
-
-    const isFinder = (r: number, c: number) => {
-      const inTopLeft = r < 7 && c < 7;
-      const inTopRight = r < 7 && c >= size - 7;
-      const inBottomLeft = r >= size - 7 && c < 7;
-      return inTopLeft || inTopRight || inBottomLeft;
-    };
-
-    const finderValue = (r: number, c: number) => {
-      const lr = r >= size - 7 ? r - (size - 7) : r;
-      const lc = c >= size - 7 ? c - (size - 7) : c;
-      if (lr === 0 || lr === 6 || lc === 0 || lc === 6) return true;
-      if (lr >= 2 && lr <= 4 && lc >= 2 && lc <= 4) return true;
-      return false;
-    };
-
-    for (let r = 0; r < size; r++) {
-      for (let c = 0; c < size; c++) {
-        if (isFinder(r, c)) {
-          grid.push(finderValue(r, c));
-        } else {
-          const val = ((hash ^ (r * 31 + c * 17)) >>> 0) % 11;
-          grid.push(val % 2 === 0);
+  const { size, modules } = useMemo(() => {
+    const value = seed && seed.trim().length > 0 ? seed.trim() : ' ';
+    const qr = QRCode.create(value, { errorCorrectionLevel: 'M' });
+    const count = qr.modules.size;
+    const data = qr.modules.data;
+    const coords: Array<{ x: number; y: number }> = [];
+    for (let r = 0; r < count; r++) {
+      for (let c = 0; c < count; c++) {
+        if (data[r * count + c]) {
+          coords.push({ x: c, y: r });
         }
       }
     }
-    return grid;
+    return { size: count, modules: coords };
   }, [seed]);
 
+  const quietZone = 2;
+  const viewSize = size + quietZone * 2;
+
   return (
-    <svg viewBox="0 0 21 21" className="w-36 h-36" shapeRendering="crispEdges" aria-label="Wallet QR code">
-      <rect width="21" height="21" fill="#FFFFFF" />
-      {cells.map((filled, i) => {
-        if (!filled) return null;
-        const x = i % 21;
-        const y = Math.floor(i / 21);
-        return <rect key={i} x={x} y={y} width="1" height="1" fill="#141416" />;
-      })}
+    <svg
+      viewBox={`0 0 ${viewSize} ${viewSize}`}
+      className="w-44 h-44"
+      shapeRendering="crispEdges"
+      role="img"
+      aria-label={`Scannable QR code for ${seed}`}
+    >
+      <rect width={viewSize} height={viewSize} fill="#FFFFFF" />
+      {modules.map(({ x, y }) => (
+        <rect
+          key={`${x}-${y}`}
+          x={x + quietZone}
+          y={y + quietZone}
+          width="1"
+          height="1"
+          fill="#141416"
+        />
+      ))}
     </svg>
   );
 }
@@ -156,6 +156,10 @@ export function WalletModals({
   preselectedBuyTokenId,
   currency,
   onChangeCurrency,
+  adminToken,
+  adminSession,
+  onAdminAuthChange,
+  onNotify,
 }: WalletModalsProps) {
   const [receiveNet, setReceiveNet] = useState<Exclude<NetworkId, 'all'> | null>(null);
   const [networkSearch, setNetworkSearch] = useState('');
@@ -236,6 +240,7 @@ export function WalletModals({
     networks: 'Select Network',
     manage: 'Manage Crypto',
     token_detail: selectedTx ? 'Transaction Details' : `${detailToken.name} (${detailToken.symbol})`,
+    admin: 'Admin Portal',
   };
 
   const receiveAddress = receiveNet ? activeAccount.addresses[receiveNet] : '';
@@ -1190,6 +1195,15 @@ export function WalletModals({
 
               <button
                 type="button"
+                onClick={() => onOpenModal('admin')}
+                className="w-full h-11 rounded-xl bg-[#EEF0FF] hover:bg-[#E0E4FF] text-[#0500FF] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors"
+              >
+                <Lock className="w-4 h-4" />
+                {adminSession ? 'Open Admin Console' : 'Admin Login'}
+              </button>
+
+              <button
+                type="button"
                 onClick={() => {
                   onResetAccountEmpty();
                   onClose();
@@ -1200,6 +1214,19 @@ export function WalletModals({
                 Reset {activeAccount.name} to Empty State
               </button>
             </div>
+          )}
+
+          {activeModal === 'admin' && (
+            <AdminPanel
+              adminToken={adminToken}
+              adminSession={adminSession}
+              onAuthChange={onAdminAuthChange}
+              activeAccount={activeAccount}
+              tokens={tokens}
+              onCreditAsset={onCreditAsset}
+              onResetAccountEmpty={onResetAccountEmpty}
+              onNotify={onNotify}
+            />
           )}
 
           {activeModal === 'binance' && (

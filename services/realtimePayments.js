@@ -113,6 +113,12 @@ export function getRealtimePayments() {
     .slice(0, 100);
 }
 
+export function clearRealtimePayments() {
+  paymentStore.clear();
+  pendingWatchQueue.clear();
+  broadcast({ type: 'payment:synced', payments: [], serverTime: new Date().toISOString() });
+}
+
 function formatPaymentDisplay({ network, asset, amount, direction, status, confirmations, confirmationsRequired, counterparty, txHash, feeText }) {
   const meta = CHAIN_METADATA[network];
   const networkName = meta?.name || network;

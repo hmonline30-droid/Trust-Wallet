@@ -115,6 +115,12 @@ export interface EarnVault {
   validator: string;
 }
 
+export interface AdminSession {
+  email: string;
+  role: 'admin';
+  expiresAt: string;
+}
+
 export type ActiveModal =
   | null
   | 'accounts'
@@ -128,4 +134,5 @@ export type ActiveModal =
   | 'buy'
   | 'networks'
   | 'manage'
-  | 'token_detail';
+  | 'token_detail'
+  | 'admin';

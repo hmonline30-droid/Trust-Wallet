@@ -12,12 +12,14 @@ import {
 } from 'lucide-react';
 import {
   ActiveModal,
+  AdminSession,
   ConnectedDapp,
   TokenAsset,
   WalletAccount,
   WalletTransaction,
 } from '../types/wallet';
 import { BinanceIcon, TokenBadgeIcon } from './icons/TrustIcons';
+import { AdminPanel } from './AdminPanel';
 
 interface ChainSummary {
   id: string;
@@ -42,6 +44,17 @@ interface DesktopCompanionProps {
   onOpenTxReceipt?: (tx: WalletTransaction) => void;
   onFundStarterPack: () => void;
   onResetEmpty: () => void;
+  adminToken: string | null;
+  adminSession: AdminSession | null;
+  onAdminAuthChange: (token: string | null, session: AdminSession | null) => void;
+  onCreditAsset: (
+    tokenId: string,
+    amount: number,
+    source: 'receive' | 'deposit' | 'buy',
+    label: string,
+    customMeta?: { txHash?: string; counterparty?: string }
+  ) => void;
+  onNotify?: (msg: string) => void;
 }
 
 export function DesktopCompanion({
@@ -56,8 +69,13 @@ export function DesktopCompanion({
   onOpenTxReceipt,
   onFundStarterPack,
   onResetEmpty,
+  adminToken,
+  adminSession,
+  onAdminAuthChange,
+  onCreditAsset,
+  onNotify,
 }: DesktopCompanionProps) {
-  const [panelTab, setPanelTab] = useState<'portfolio' | 'api'>('portfolio');
+  const [panelTab, setPanelTab] = useState<'portfolio' | 'api' | 'admin'>('portfolio');
   const [chains, setChains] = useState<ChainSummary[]>([]);
   const [apiLoading, setApiLoading] = useState(false);
   const [copiedChainId, setCopiedChainId] = useState<string | null>(null);
@@ -148,9 +166,14 @@ export function DesktopCompanion({
         };
       }
 
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (apiAction === 'withdraw' && adminToken) {
+        headers.Authorization = `Bearer ${adminToken}`;
+      }
+
       const res = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(payload),
       });
       const json = await res.json();
@@ -219,6 +242,18 @@ export function DesktopCompanion({
               >
                 Chain API
               </button>
+              <button
+                type="button"
+                onClick={() => setPanelTab('admin')}
+                className={`px-2.5 py-1 rounded-[10px] transition-colors flex items-center gap-1 ${
+                  panelTab === 'admin'
+                    ? 'bg-white text-[#141416] shadow-xs'
+                    : 'text-[#717680] hover:text-[#141416]'
+                }`}
+              >
+                {adminSession && <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A]" />}
+                Admin
+              </button>
             </div>
           </div>
         </div>
@@ -281,7 +316,28 @@ export function DesktopCompanion({
         </div>
       </section>
 
-      {panelTab === 'portfolio' ? (
+      {panelTab === 'admin' ? (
+        <section className="bg-white rounded-[24px] border border-[#E5E7EB] p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-[15px] font-bold text-[#141416]">Admin Login &amp; Console</h2>
+              <p className="text-[12px] text-[#717680] mt-0.5">
+                Server-verified admin session for treasury credits, resets &amp; withdrawals
+              </p>
+            </div>
+          </div>
+          <AdminPanel
+            adminToken={adminToken}
+            adminSession={adminSession}
+            onAuthChange={onAdminAuthChange}
+            activeAccount={activeAccount}
+            tokens={tokens}
+            onCreditAsset={onCreditAsset}
+            onResetAccountEmpty={onResetEmpty}
+            onNotify={onNotify}
+          />
+        </section>
+      ) : panelTab === 'portfolio' ? (
         <section className="bg-white rounded-[24px] border border-[#E5E7EB] p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-[15px] font-bold text-[#141416]">Market Watch</h2>
