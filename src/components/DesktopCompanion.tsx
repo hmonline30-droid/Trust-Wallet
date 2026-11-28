@@ -66,9 +66,9 @@ export function DesktopCompanion({
   const [apiAction, setApiAction] = useState<'verify' | 'withdraw' | 'validate'>('verify');
   const [selectedChain, setSelectedChain] = useState('ethereum');
   const [txHashInput, setTxHashInput] = useState(
-    '0x3a71f8c904e21b55d98a4c112f6e90b3d4a7c8291e5f6a0b3c8d7e6f5a4b3c2d'
+    '0x9c4f82e17b3a05d619e4a2b7c80f31e59d2a6c40b817f3e95a1c2d4e6f809b32'
   );
-  const [addressInput, setAddressInput] = useState('0x1188ccb327273033B3E2DEe33bCB2D0A902BB936');
+  const [addressInput, setAddressInput] = useState('0x4b8F8e6b5017eac6A6FDa7499FC935A15118E9E6');
   const [amountInput, setAmountInput] = useState('250');
   const [tokenTypeInput, setTokenTypeInput] = useState('USDT');
   const [memoInput, setMemoInput] = useState('');

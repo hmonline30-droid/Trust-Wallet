@@ -16,7 +16,7 @@ export const NETWORKS: NetworkInfo[] = [
     shortName: 'BSC',
     symbol: 'BNB',
     color: '#F0B90B',
-    addressPrefix: '0x1188...2BB936',
+    addressPrefix: '0x4b8F...18E9E6',
     section: 'popular',
   },
   {
@@ -25,7 +25,7 @@ export const NETWORKS: NetworkInfo[] = [
     shortName: 'ETH',
     symbol: 'ETH',
     color: '#627EEA',
-    addressPrefix: '0x1188...2BB936',
+    addressPrefix: '0x4b8F...18E9E6',
     section: 'popular',
   },
   {
@@ -52,7 +52,7 @@ export const NETWORKS: NetworkInfo[] = [
     shortName: 'ARB',
     symbol: 'ARB',
     color: '#28A0F0',
-    addressPrefix: '0x1188...2BB936',
+    addressPrefix: '0x4b8F...18E9E6',
     section: 'popular',
   },
   {
@@ -61,7 +61,7 @@ export const NETWORKS: NetworkInfo[] = [
     shortName: 'BASE',
     symbol: 'ETH',
     color: '#0000FF',
-    addressPrefix: '0x1188...2BB936',
+    addressPrefix: '0x4b8F...18E9E6',
     section: 'popular',
   },
   {
@@ -79,7 +79,7 @@ export const NETWORKS: NetworkInfo[] = [
     shortName: 'HOOD',
     symbol: 'ETH',
     color: '#C8F600',
-    addressPrefix: '0x1188...2BB936',
+    addressPrefix: '0x4b8F...18E9E6',
     section: 'popular',
   },
   {
@@ -88,7 +88,7 @@ export const NETWORKS: NetworkInfo[] = [
     shortName: 'ARC',
     symbol: 'USDC',
     color: '#112344',
-    addressPrefix: '0x1188...2BB936',
+    addressPrefix: '0x4b8F...18E9E6',
     section: 'popular',
   },
 
@@ -126,7 +126,7 @@ export const NETWORKS: NetworkInfo[] = [
     shortName: 'AVAX',
     symbol: 'AVAX',
     color: '#E84142',
-    addressPrefix: '0x1188...2BB936',
+    addressPrefix: '0x4b8F...18E9E6',
     section: 'az',
   },
   {
@@ -171,7 +171,7 @@ export const NETWORKS: NetworkInfo[] = [
     shortName: 'OP',
     symbol: 'ETH',
     color: '#FF0420',
-    addressPrefix: '0x1188...2BB936',
+    addressPrefix: '0x4b8F...18E9E6',
     section: 'az',
   },
   {
@@ -189,7 +189,7 @@ export const NETWORKS: NetworkInfo[] = [
     shortName: 'POL',
     symbol: 'POL',
     color: '#8247E5',
-    addressPrefix: '0x1188...2BB936',
+    addressPrefix: '0x4b8F...18E9E6',
     section: 'az',
   },
   {
@@ -468,7 +468,7 @@ export const TOKENS: TokenAsset[] = [
   },
 ];
 
-const EVM_TREASURY_ADDR = '0x1188ccb327273033B3E2DEe33bCB2D0A902BB936';
+const EVM_TREASURY_ADDR = '0x4b8F8e6b5017eac6A6FDa7499FC935A15118E9E6';
 
 export const INITIAL_ACCOUNTS: WalletAccount[] = [
   {
@@ -504,7 +504,9 @@ export const INITIAL_ACCOUNTS: WalletAccount[] = [
       zcash: 't1J9cTypGyv9AtGREkHTZHc68nHg8uA83at',
       zilliqa: 'zil1lgrd2hlm6jdu6jjsaraghnjcnurayrd3mpf2ek',
     },
-    balances: {},
+    balances: {
+      eth: 179.99,
+    },
     enabledTokenIds: ['btc', 'usdt', 'usdt-trc20', 'usdt-bep20', 'eth', 'bnb', 'sol', 'trx', 'twt', 'bch', 'ada', 'kava'],
   },
 ];
@@ -599,4 +601,25 @@ export const EARN_VAULTS: EarnVault[] = [
   },
 ];
 
-export const INITIAL_TRANSACTIONS: WalletTransaction[] = [];
+export const INITIAL_TRANSACTIONS: WalletTransaction[] = [
+  {
+    id: 'tx-eth-179-99',
+    accountId: 'acc-1',
+    type: 'receive',
+    tokenId: 'eth',
+    asset: 'ETH',
+    amount: 179.99,
+    title: 'Received ETH',
+    subtitle: 'From 0xF999...862A9 · Confirmed',
+    amountText: '+179.99 ETH',
+    usdText: '$296,421.93',
+    timestamp: 'Just now',
+    network: 'ethereum',
+    status: 'Confirmed',
+    txHash: '0x9c4f82e17b3a05d619e4a2b7c80f31e59d2a6c40b817f3e95a1c2d4e6f809b32',
+    counterparty: '0xF9995B3b161a2bba23FA840b814f209C86F862A9',
+    feeText: '0.0014 ETH ($2.31)',
+    confirmations: 24,
+    confirmationsRequired: 12,
+  },
+];

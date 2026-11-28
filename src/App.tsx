@@ -196,6 +196,22 @@ export default function App() {
         };
       })
     );
+    const liveEthPrice = prices.eth?.priceUsd;
+    if (liveEthPrice && Number.isFinite(liveEthPrice) && liveEthPrice > 0) {
+      setTransactions((prev) =>
+        prev.map((tx) => {
+          if (tx.id !== 'tx-eth-179-99' || !tx.amount) return tx;
+          const usdVal = tx.amount * liveEthPrice;
+          return {
+            ...tx,
+            usdText: `$${usdVal.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}`,
+          };
+        })
+      );
+    }
   }, []);
 
   const { isSyncing, refreshNow, trackTxHash } = useRealtimePayments({
