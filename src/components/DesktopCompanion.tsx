@@ -4,10 +4,12 @@ import {
   Check,
   Copy,
   CreditCard,
+  Moon,
   RefreshCw,
   RotateCcw,
   Send,
   ShieldCheck,
+  Sun,
   Wallet,
 } from 'lucide-react';
 import {
@@ -38,6 +40,8 @@ interface DesktopCompanionProps {
   transactions: WalletTransaction[];
   dapps: ConnectedDapp[];
   currency: 'USD' | 'EUR';
+  theme?: 'light' | 'dark';
+  onToggleTheme?: () => void;
   onRefreshPayments?: () => void;
   isSyncingPayments?: boolean;
   onOpenModal: (modal: ActiveModal) => void;
@@ -63,6 +67,8 @@ export function DesktopCompanion({
   transactions,
   dapps,
   currency,
+  theme = 'light',
+  onToggleTheme,
   onRefreshPayments,
   isSyncingPayments = false,
   onOpenModal,
@@ -196,37 +202,50 @@ export function DesktopCompanion({
   return (
     <aside className="hidden lg:flex flex-col gap-5 flex-1 max-w-[540px]">
       {/* Portfolio Snapshot Card */}
-      <section className="bg-white rounded-[24px] border border-[#E5E7EB] p-6">
+      <section className="bg-white dark:bg-[#14171F] rounded-[24px] border border-[#E5E7EB] dark:border-[#232836] p-6 transition-colors">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[12.5px] font-medium text-[#717680]">
+            <p className="text-[12.5px] font-medium text-[#717680] dark:text-[#8E95A5]">
               {activeAccount.seedGroup} · {activeAccount.name}
             </p>
-            <div className="mt-1 text-[34px] leading-none font-bold tracking-tight text-[#141416] tabular-nums">
+            <div className="mt-1 text-[34px] leading-none font-bold tracking-tight text-[#141416] dark:text-[#F4F5F7] tabular-nums">
               {symbolChar}
               {(totalPortfolioUsd * rate).toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
             </div>
-            <p className="mt-2 text-[13px] text-[#717680]">
+            <p className="mt-2 text-[13px] text-[#717680] dark:text-[#8E95A5]">
               {hasBalance
                 ? 'Multi-chain self-custody balance synchronized with the wallet extension.'
                 : 'Wallet is currently empty. Add funds using Receive, Binance, Buy, or the quick actions below.'}
             </p>
           </div>
           <div className="flex flex-col items-end gap-2 shrink-0">
-            <div className="w-11 h-11 rounded-2xl bg-[#EEF0FF] text-[#0500FF] flex items-center justify-center">
-              <Wallet className="w-5 h-5" />
+            <div className="flex items-center gap-2">
+              {onToggleTheme && (
+                <button
+                  type="button"
+                  onClick={onToggleTheme}
+                  title={theme === 'dark' ? 'Switch to Day Mode' : 'Switch to Night Mode'}
+                  aria-label={theme === 'dark' ? 'Switch to Day Mode' : 'Switch to Night Mode'}
+                  className="w-11 h-11 rounded-2xl bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] text-[#141416] dark:text-[#FACC15] flex items-center justify-center transition-colors"
+                >
+                  {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                </button>
+              )}
+              <div className="w-11 h-11 rounded-2xl bg-[#EEF0FF] dark:bg-[#1E2747] text-[#0500FF] dark:text-[#8FA4FF] flex items-center justify-center">
+                <Wallet className="w-5 h-5" />
+              </div>
             </div>
-            <div className="flex bg-[#EFEFF2] p-0.5 rounded-xl text-[12px] font-semibold">
+            <div className="flex bg-[#EFEFF2] dark:bg-[#1C202B] p-0.5 rounded-xl text-[12px] font-semibold">
               <button
                 type="button"
                 onClick={() => setPanelTab('portfolio')}
                 className={`px-2.5 py-1 rounded-[10px] transition-colors ${
                   panelTab === 'portfolio'
-                    ? 'bg-white text-[#141416] shadow-xs'
-                    : 'text-[#717680] hover:text-[#141416]'
+                    ? 'bg-white dark:bg-[#282E3E] text-[#141416] dark:text-[#F4F5F7] shadow-xs'
+                    : 'text-[#717680] dark:text-[#8E95A5] hover:text-[#141416] dark:hover:text-[#F4F5F7]'
                 }`}
               >
                 Portfolio
@@ -236,8 +255,8 @@ export function DesktopCompanion({
                 onClick={() => setPanelTab('api')}
                 className={`px-2.5 py-1 rounded-[10px] transition-colors ${
                   panelTab === 'api'
-                    ? 'bg-white text-[#141416] shadow-xs'
-                    : 'text-[#717680] hover:text-[#141416]'
+                    ? 'bg-white dark:bg-[#282E3E] text-[#141416] dark:text-[#F4F5F7] shadow-xs'
+                    : 'text-[#717680] dark:text-[#8E95A5] hover:text-[#141416] dark:hover:text-[#F4F5F7]'
                 }`}
               >
                 Chain API
@@ -247,8 +266,8 @@ export function DesktopCompanion({
                 onClick={() => setPanelTab('admin')}
                 className={`px-2.5 py-1 rounded-[10px] transition-colors flex items-center gap-1 ${
                   panelTab === 'admin'
-                    ? 'bg-white text-[#141416] shadow-xs'
-                    : 'text-[#717680] hover:text-[#141416]'
+                    ? 'bg-white dark:bg-[#282E3E] text-[#141416] dark:text-[#F4F5F7] shadow-xs'
+                    : 'text-[#717680] dark:text-[#8E95A5] hover:text-[#141416] dark:hover:text-[#F4F5F7]'
                 }`}
               >
                 {adminSession && <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A]" />}
@@ -259,12 +278,12 @@ export function DesktopCompanion({
         </div>
 
         {/* Action Strip */}
-        <div className="mt-5 pt-5 border-t border-[#ECEDF0] flex flex-wrap items-center gap-2">
+        <div className="mt-5 pt-5 border-t border-[#ECEDF0] dark:border-[#232836] flex flex-wrap items-center gap-2">
           {hasBalance && (
             <button
               type="button"
               onClick={() => onOpenModal('send')}
-              className="px-3.5 py-2 rounded-xl bg-[#EFEFF2] hover:bg-[#E4E5EA] text-[13px] font-semibold text-[#141416] flex items-center gap-1.5 transition-colors whitespace-nowrap"
+              className="px-3.5 py-2 rounded-xl bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] text-[13px] font-semibold text-[#141416] dark:text-[#F4F5F7] flex items-center gap-1.5 transition-colors whitespace-nowrap"
             >
               <Send className="w-3.5 h-3.5" />
               Send
@@ -273,7 +292,7 @@ export function DesktopCompanion({
           <button
             type="button"
             onClick={() => onOpenModal('receive')}
-            className="px-3.5 py-2 rounded-xl bg-[#EFEFF2] hover:bg-[#E4E5EA] text-[13px] font-semibold text-[#141416] flex items-center gap-1.5 transition-colors whitespace-nowrap"
+            className="px-3.5 py-2 rounded-xl bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] text-[13px] font-semibold text-[#141416] dark:text-[#F4F5F7] flex items-center gap-1.5 transition-colors whitespace-nowrap"
           >
             <ArrowDownLeft className="w-4 h-4" />
             Receive
@@ -281,7 +300,7 @@ export function DesktopCompanion({
           <button
             type="button"
             onClick={() => onOpenModal('binance')}
-            className="px-3.5 py-2 rounded-xl bg-[#EFEFF2] hover:bg-[#E4E5EA] text-[13px] font-semibold text-[#141416] flex items-center gap-1.5 transition-colors whitespace-nowrap"
+            className="px-3.5 py-2 rounded-xl bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] text-[13px] font-semibold text-[#141416] dark:text-[#F4F5F7] flex items-center gap-1.5 transition-colors whitespace-nowrap"
           >
             <BinanceIcon className="w-4 h-4" />
             Binance
@@ -299,7 +318,7 @@ export function DesktopCompanion({
             <button
               type="button"
               onClick={onFundStarterPack}
-              className="ml-auto px-3.5 py-2 rounded-xl border border-[#E5E7EB] hover:bg-[#F8F9FB] text-[12.5px] font-semibold text-[#0500FF] transition-colors whitespace-nowrap"
+              className="ml-auto px-3.5 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2D3343] hover:bg-[#F8F9FB] dark:hover:bg-[#1C202B] text-[12.5px] font-semibold text-[#0500FF] dark:text-[#8FA4FF] transition-colors whitespace-nowrap"
             >
               Load Sample Assets
             </button>
@@ -307,7 +326,7 @@ export function DesktopCompanion({
             <button
               type="button"
               onClick={onResetEmpty}
-              className="ml-auto px-3.5 py-2 rounded-xl border border-[#E5E7EB] hover:bg-[#F8F9FB] text-[12.5px] font-semibold text-[#717680] hover:text-[#141416] flex items-center gap-1.5 transition-colors whitespace-nowrap"
+              className="ml-auto px-3.5 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2D3343] hover:bg-[#F8F9FB] dark:hover:bg-[#1C202B] text-[12.5px] font-semibold text-[#717680] dark:text-[#8E95A5] hover:text-[#141416] dark:hover:text-[#F4F5F7] flex items-center gap-1.5 transition-colors whitespace-nowrap"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               Reset Empty
@@ -317,11 +336,11 @@ export function DesktopCompanion({
       </section>
 
       {panelTab === 'admin' ? (
-        <section className="bg-white rounded-[24px] border border-[#E5E7EB] p-6 space-y-4">
+        <section className="bg-white dark:bg-[#14171F] rounded-[24px] border border-[#E5E7EB] dark:border-[#232836] p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-[15px] font-bold text-[#141416]">Admin Login &amp; Console</h2>
-              <p className="text-[12px] text-[#717680] mt-0.5">
+              <h2 className="text-[15px] font-bold text-[#141416] dark:text-[#F4F5F7]">Admin Login &amp; Console</h2>
+              <p className="text-[12px] text-[#717680] dark:text-[#8E95A5] mt-0.5">
                 Server-verified admin session for treasury credits, resets &amp; withdrawals
               </p>
             </div>
@@ -338,18 +357,18 @@ export function DesktopCompanion({
           />
         </section>
       ) : panelTab === 'portfolio' ? (
-        <section className="bg-white rounded-[24px] border border-[#E5E7EB] p-6">
+        <section className="bg-white dark:bg-[#14171F] rounded-[24px] border border-[#E5E7EB] dark:border-[#232836] p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[15px] font-bold text-[#141416]">Market Watch</h2>
-            <div className="flex items-center gap-2 text-[12px] text-[#717680]">
-              <ShieldCheck className="w-4 h-4 text-[#0500FF]" />
+            <h2 className="text-[15px] font-bold text-[#141416] dark:text-[#F4F5F7]">Market Watch</h2>
+            <div className="flex items-center gap-2 text-[12px] text-[#717680] dark:text-[#8E95A5]">
+              <ShieldCheck className="w-4 h-4 text-[#0500FF] dark:text-[#6B85FF]" />
               <span>
                 {connectedCount} dApp{connectedCount === 1 ? '' : 's'} connected
               </span>
             </div>
           </div>
 
-          <div className="divide-y divide-[#F1F2F5]">
+          <div className="divide-y divide-[#F1F2F5] dark:divide-[#232836]">
             {[...tokens]
               .sort((a, b) => {
                 const aVal = (activeAccount.balances[a.id] ?? 0) * a.priceUsd;
@@ -372,10 +391,10 @@ export function DesktopCompanion({
                         className="w-8 h-8"
                       />
                       <div className="min-w-0">
-                        <div className="text-[13.5px] font-semibold text-[#141416] truncate">
+                        <div className="text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7] truncate">
                           {token.name}
                         </div>
-                        <div className="text-[12px] text-[#717680] tabular-nums">
+                        <div className="text-[12px] text-[#717680] dark:text-[#8E95A5] tabular-nums">
                           {bal > 0
                             ? `${bal.toLocaleString('en-US', { maximumFractionDigits: 4 })} ${token.symbol}`
                             : token.symbol}
@@ -383,7 +402,7 @@ export function DesktopCompanion({
                       </div>
                     </div>
                     <div className="text-right tabular-nums shrink-0">
-                      <div className="text-[13.5px] font-semibold text-[#141416]">
+                      <div className="text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7]">
                         {symbolChar}
                         {(token.priceUsd * rate).toLocaleString('en-US', {
                           minimumFractionDigits: 2,
@@ -392,7 +411,7 @@ export function DesktopCompanion({
                       </div>
                       <div
                         className={`text-[12px] font-medium ${
-                          isPos ? 'text-[#16A34A]' : 'text-[#DC2626]'
+                          isPos ? 'text-[#16A34A] dark:text-[#4ADE80]' : 'text-[#DC2626] dark:text-[#F87171]'
                         }`}
                       >
                         {isPos ? '+' : ''}
@@ -405,9 +424,9 @@ export function DesktopCompanion({
           </div>
 
           {transactions.length > 0 && (
-            <div className="mt-5 pt-4 border-t border-[#ECEDF0]">
+            <div className="mt-5 pt-4 border-t border-[#ECEDF0] dark:border-[#232836]">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-[13.5px] font-bold text-[#141416]">Recent Activity</h3>
+                <h3 className="text-[13.5px] font-bold text-[#141416] dark:text-[#F4F5F7]">Recent Activity</h3>
                 <div className="flex items-center gap-2">
                   {onRefreshPayments && (
                     <button
@@ -415,17 +434,17 @@ export function DesktopCompanion({
                       onClick={onRefreshPayments}
                       disabled={isSyncingPayments}
                       aria-label="Sync on-chain payments"
-                      className="p-1 rounded-full hover:bg-[#F3F4F6] text-[#717680] hover:text-[#141416] transition-colors"
+                      className="p-1 rounded-full hover:bg-[#F3F4F6] dark:hover:bg-[#1C202B] text-[#717680] dark:text-[#8E95A5] hover:text-[#141416] dark:hover:text-[#F4F5F7] transition-colors"
                     >
                       <RefreshCw
-                        className={`w-3.5 h-3.5 ${isSyncingPayments ? 'animate-spin text-[#0500FF]' : ''}`}
+                        className={`w-3.5 h-3.5 ${isSyncingPayments ? 'animate-spin text-[#0500FF] dark:text-[#6B85FF]' : ''}`}
                       />
                     </button>
                   )}
                   <button
                     type="button"
                     onClick={() => onOpenModal('history')}
-                    className="text-[12px] font-semibold text-[#0500FF] hover:underline"
+                    className="text-[12px] font-semibold text-[#0500FF] dark:text-[#6B85FF] hover:underline"
                   >
                     View all ({transactions.length})
                   </button>
@@ -440,21 +459,21 @@ export function DesktopCompanion({
                       key={tx.id}
                       type="button"
                       onClick={() => (onOpenTxReceipt ? onOpenTxReceipt(tx) : onOpenModal('history'))}
-                      className="w-full flex items-center justify-between text-[12.5px] hover:bg-[#F8F9FB] rounded-lg px-1.5 py-1 -mx-1.5 transition-colors text-left"
+                      className="w-full flex items-center justify-between text-[12.5px] hover:bg-[#F8F9FB] dark:hover:bg-[#1C202B] rounded-lg px-1.5 py-1 -mx-1.5 transition-colors text-left"
                     >
-                      <span className="text-[#525866] truncate pr-2">
+                      <span className="text-[#525866] dark:text-[#9CA3AF] truncate pr-2">
                         {tx.title} ·{' '}
-                        <span className={isPending ? 'text-[#D97706] font-medium' : 'text-[#9CA3AF]'}>
+                        <span className={isPending ? 'text-[#D97706] dark:text-[#FBBF24] font-medium' : 'text-[#9CA3AF] dark:text-[#6B7280]'}>
                           {isPending ? 'Pending' : tx.timestamp}
                         </span>
                       </span>
                       <span
                         className={`font-semibold tabular-nums shrink-0 ${
                           isPending
-                            ? 'text-[#D97706]'
+                            ? 'text-[#D97706] dark:text-[#FBBF24]'
                             : isOutgoing
-                              ? 'text-[#DC2626]'
-                              : 'text-[#16A34A]'
+                              ? 'text-[#DC2626] dark:text-[#F87171]'
+                              : 'text-[#16A34A] dark:text-[#4ADE80]'
                         }`}
                       >
                         {tx.amountText}
@@ -467,13 +486,13 @@ export function DesktopCompanion({
           )}
         </section>
       ) : (
-        <section className="bg-white rounded-[24px] border border-[#E5E7EB] p-6 space-y-4">
+        <section className="bg-white dark:bg-[#14171F] rounded-[24px] border border-[#E5E7EB] dark:border-[#232836] p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-[15px] font-bold text-[#141416]">
+              <h2 className="text-[15px] font-bold text-[#141416] dark:text-[#F4F5F7]">
                 Multi-Chain Gateway ({chains.length || 22} Networks)
               </h2>
-              <p className="text-[12px] text-[#717680] mt-0.5">
+              <p className="text-[12px] text-[#717680] dark:text-[#8E95A5] mt-0.5">
                 Plugin routes in <span className="font-mono">/services/chains/</span> via{' '}
                 <span className="font-mono">walletController.js</span>
               </p>
@@ -481,7 +500,7 @@ export function DesktopCompanion({
           </div>
 
           {/* Endpoint Tester */}
-          <div className="p-3.5 rounded-2xl bg-[#F8F9FB] border border-[#ECEDF0] space-y-2.5">
+          <div className="p-3.5 rounded-2xl bg-[#F8F9FB] dark:bg-[#1A1E29] border border-[#ECEDF0] dark:border-[#232836] space-y-2.5">
             <div className="grid grid-cols-3 gap-1.5 text-[12px] font-semibold">
               <button
                 type="button"
@@ -489,7 +508,7 @@ export function DesktopCompanion({
                 className={`py-1.5 rounded-xl transition-colors ${
                   apiAction === 'verify'
                     ? 'bg-[#0500FF] text-white'
-                    : 'bg-white border border-[#E5E7EB] text-[#525866]'
+                    : 'bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[#525866] dark:text-[#9CA3AF]'
                 }`}
               >
                 Verify Deposit
@@ -500,7 +519,7 @@ export function DesktopCompanion({
                 className={`py-1.5 rounded-xl transition-colors ${
                   apiAction === 'withdraw'
                     ? 'bg-[#0500FF] text-white'
-                    : 'bg-white border border-[#E5E7EB] text-[#525866]'
+                    : 'bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[#525866] dark:text-[#9CA3AF]'
                 }`}
               >
                 Withdraw
@@ -511,7 +530,7 @@ export function DesktopCompanion({
                 className={`py-1.5 rounded-xl transition-colors ${
                   apiAction === 'validate'
                     ? 'bg-[#0500FF] text-white'
-                    : 'bg-white border border-[#E5E7EB] text-[#525866]'
+                    : 'bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[#525866] dark:text-[#9CA3AF]'
                 }`}
               >
                 Validate Addr
@@ -530,7 +549,7 @@ export function DesktopCompanion({
                     setTokenTypeInput(found.supportedTokens?.[0] ?? found.symbol);
                   }
                 }}
-                className="px-2.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[12.5px] font-semibold text-[#141416]"
+                className="px-2.5 py-2 rounded-xl bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[12.5px] font-semibold text-[#141416] dark:text-[#F4F5F7]"
               >
                 {chains.length > 0 ? (
                   chains.map((c) => (
@@ -548,7 +567,7 @@ export function DesktopCompanion({
                 value={tokenTypeInput}
                 onChange={(e) => setTokenTypeInput(e.target.value)}
                 placeholder="Token (e.g. USDT)"
-                className="px-2.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[12.5px] font-medium text-[#141416]"
+                className="px-2.5 py-2 rounded-xl bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[12.5px] font-medium text-[#141416] dark:text-[#F4F5F7]"
               />
             </div>
 
@@ -558,7 +577,7 @@ export function DesktopCompanion({
                 value={txHashInput}
                 onChange={(e) => setTxHashInput(e.target.value)}
                 placeholder="Transaction hash (txHash)"
-                className="w-full px-2.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[12px] font-mono text-[#141416]"
+                className="w-full px-2.5 py-2 rounded-xl bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[12px] font-mono text-[#141416] dark:text-[#F4F5F7]"
               />
             ) : (
               <div className="grid grid-cols-3 gap-2">
@@ -569,7 +588,7 @@ export function DesktopCompanion({
                   placeholder="Destination address"
                   className={`${
                     apiAction === 'withdraw' ? 'col-span-2' : 'col-span-3'
-                  } px-2.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[12px] font-mono text-[#141416]`}
+                  } px-2.5 py-2 rounded-xl bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[12px] font-mono text-[#141416] dark:text-[#F4F5F7]`}
                 />
                 {apiAction === 'withdraw' && (
                   <input
@@ -578,7 +597,7 @@ export function DesktopCompanion({
                     value={amountInput}
                     onChange={(e) => setAmountInput(e.target.value)}
                     placeholder="Amount"
-                    className="px-2.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[12.5px] font-semibold tabular-nums text-[#141416]"
+                    className="px-2.5 py-2 rounded-xl bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[12.5px] font-semibold tabular-nums text-[#141416] dark:text-[#F4F5F7]"
                   />
                 )}
               </div>
@@ -590,7 +609,7 @@ export function DesktopCompanion({
                 value={memoInput}
                 onChange={(e) => setMemoInput(e.target.value)}
                 placeholder="Memo / Destination Tag (XRP, XLM, TON)"
-                className="w-full px-2.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[12px] font-mono text-[#141416]"
+                className="w-full px-2.5 py-2 rounded-xl bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[12px] font-mono text-[#141416] dark:text-[#F4F5F7]"
               />
             )}
 
@@ -598,7 +617,7 @@ export function DesktopCompanion({
               type="button"
               disabled={submittingApi}
               onClick={handleRunApiAction}
-              className="w-full h-9 rounded-xl bg-[#141416] hover:bg-[#27272A] disabled:opacity-60 text-white text-[12.5px] font-semibold transition-colors"
+              className="w-full h-9 rounded-xl bg-[#141416] dark:bg-[#0500FF] hover:bg-[#27272A] dark:hover:bg-[#0400D6] disabled:opacity-60 text-white text-[12.5px] font-semibold transition-colors"
             >
               {submittingApi
                 ? 'Executing...'
@@ -610,7 +629,7 @@ export function DesktopCompanion({
             </button>
 
             {apiResponse && (
-              <pre className="p-2.5 rounded-xl bg-[#141416] text-[#E5E7EB] text-[11px] font-mono overflow-x-auto max-h-36">
+              <pre className="p-2.5 rounded-xl bg-[#141416] dark:bg-[#0B0D12] border border-transparent dark:border-[#232836] text-[#E5E7EB] text-[11px] font-mono overflow-x-auto max-h-36">
                 {apiResponse}
               </pre>
             )}
@@ -618,28 +637,28 @@ export function DesktopCompanion({
 
           {/* Treasury Directory */}
           <div>
-            <div className="text-[12.5px] font-bold text-[#141416] mb-2">
+            <div className="text-[12.5px] font-bold text-[#141416] dark:text-[#F4F5F7] mb-2">
               Master Treasury Endpoints
             </div>
             {apiLoading ? (
-              <div className="text-[12.5px] text-[#717680] py-4 text-center">
+              <div className="text-[12.5px] text-[#717680] dark:text-[#8E95A5] py-4 text-center">
                 Loading chain registry...
               </div>
             ) : (
-              <div className="max-h-[190px] overflow-y-auto wallet-scroll divide-y divide-[#F1F2F5] pr-1">
+              <div className="max-h-[190px] overflow-y-auto wallet-scroll divide-y divide-[#F1F2F5] dark:divide-[#232836] pr-1">
                 {chains.map((chain) => (
                   <div
                     key={chain.id}
                     className="py-2 flex items-center justify-between gap-2 text-[12px]"
                   >
                     <div className="min-w-0">
-                      <div className="font-semibold text-[#141416]">
+                      <div className="font-semibold text-[#141416] dark:text-[#F4F5F7]">
                         {chain.name}{' '}
-                        <span className="text-[#717680] font-normal">
+                        <span className="text-[#717680] dark:text-[#8E95A5] font-normal">
                           · {chain.family}
                         </span>
                       </div>
-                      <div className="font-mono text-[11px] text-[#717680] truncate">
+                      <div className="font-mono text-[11px] text-[#717680] dark:text-[#8E95A5] truncate">
                         {chain.treasuryAddress}
                       </div>
                     </div>
@@ -647,10 +666,10 @@ export function DesktopCompanion({
                       type="button"
                       onClick={() => handleCopyTreasury(chain.id, chain.treasuryAddress)}
                       aria-label={`Copy ${chain.name} treasury address`}
-                      className="p-1.5 rounded-lg hover:bg-[#F3F4F6] text-[#717680] hover:text-[#141416] shrink-0"
+                      className="p-1.5 rounded-lg hover:bg-[#F3F4F6] dark:hover:bg-[#1C202B] text-[#717680] dark:text-[#8E95A5] hover:text-[#141416] dark:hover:text-[#F4F5F7] shrink-0"
                     >
                       {copiedChainId === chain.id ? (
-                        <Check className="w-3.5 h-3.5 text-[#16A34A]" />
+                        <Check className="w-3.5 h-3.5 text-[#16A34A] dark:text-[#4ADE80]" />
                       ) : (
                         <Copy className="w-3.5 h-3.5" />
                       )}

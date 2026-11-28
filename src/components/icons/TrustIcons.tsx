@@ -38,18 +38,24 @@ export function BinanceIcon({ className = 'w-6 h-6' }: { className?: string }) {
 }
 
 export function HomeNavIcon({ active, className = 'w-5 h-5' }: { active?: boolean; className?: string }) {
-  const color = active ? '#0500FF' : '#141416';
   return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={`${className} ${
+        active ? 'text-[#0500FF] dark:text-[#6B85FF]' : 'text-[#141416] dark:text-[#F4F5F7]'
+      }`}
+      aria-hidden="true"
+    >
       <path
         d="M4.5 10.2C4.5 9.4 4.88 8.65 5.52 8.18L10.52 4.52C11.4 3.88 12.6 3.88 13.48 4.52L18.48 8.18C19.12 8.65 19.5 9.4 19.5 10.2V17.5C19.5 18.88 18.38 20 17 20H7C5.62 20 4.5 18.88 4.5 17.5V10.2Z"
-        stroke={color}
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinejoin="round"
-        fill={active ? '#0500FF' : 'none'}
-        fillOpacity={active ? '0.1' : '0'}
+        fill={active ? 'currentColor' : 'none'}
+        fillOpacity={active ? '0.14' : '0'}
       />
-      <path d="M9.5 15.2H14.5" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <path d="M9.5 15.2H14.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -397,7 +403,7 @@ export function TokenBadgeIcon({
       {shouldShowBadge && networkId && (
         <NetworkLogoIcon
           networkId={networkId}
-          className="w-[46%] h-[46%] absolute -bottom-[2px] -right-[2px] ring-[1.8px] ring-white shadow-xs"
+          className="w-[46%] h-[46%] absolute -bottom-[2px] -right-[2px] ring-[1.8px] ring-white dark:ring-[#14171F] shadow-xs"
         />
       )}
     </div>

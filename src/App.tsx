@@ -1,6 +1,7 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   History,
+  Moon,
   Pin,
   PinOff,
   Repeat2,
@@ -8,6 +9,7 @@ import {
   Settings,
   ShieldCheck,
   Sprout,
+  Sun,
   TrendingUp,
   X,
 } from 'lucide-react';
@@ -59,6 +61,14 @@ export default function App() {
   const [selectedTokenId, setSelectedTokenId] = useState<string>('usdt');
   const [preselectedBuyTokenId, setPreselectedBuyTokenId] = useState<string>('eth');
   const [currency, setCurrency] = useState<'USD' | 'EUR'>('USD');
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    try {
+      const saved = window.localStorage.getItem('trustwallet_theme');
+      return saved === 'dark' ? 'dark' : 'light';
+    } catch {
+      return 'light';
+    }
+  });
   const [isPinned, setIsPinned] = useState<boolean>(false);
   const [isMinimized, setIsMinimized] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -68,6 +78,20 @@ export default function App() {
   const creditedServerKeysRef = useRef<Set<string>>(new Set());
   const tokensRef = useRef<TokenAsset[]>(TOKENS);
   tokensRef.current = tokens;
+
+  useEffect(() => {
+    const isDark = theme === 'dark';
+    document.documentElement.classList.toggle('dark', isDark);
+    try {
+      window.localStorage.setItem('trustwallet_theme', theme);
+    } catch {
+      // Ignore storage failures in restricted frames
+    }
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute('content', isDark ? '#0B0D12' : '#0500FF');
+    }
+  }, [theme]);
 
   const activeAccount =
     accounts.find((a) => a.id === activeAccountId) ?? accounts[0];
@@ -82,6 +106,22 @@ export default function App() {
       setToastMessage((prev) => (prev === msg ? null : prev));
     }, 2600);
   }, []);
+
+  const handleChangeTheme = useCallback(
+    (next: 'light' | 'dark') => {
+      setTheme(next);
+      showToast(next === 'dark' ? 'Night Mode enabled' : 'Day Mode enabled');
+    },
+    [showToast]
+  );
+
+  const handleToggleTheme = useCallback(() => {
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      showToast(next === 'dark' ? 'Night Mode enabled' : 'Day Mode enabled');
+      return next;
+    });
+  }, [showToast]);
 
   const handleAdminAuthChange = useCallback(
     (token: string | null, session: AdminSession | null) => {
@@ -568,17 +608,17 @@ export default function App() {
   const hasConnectedDapp = dapps.some((d) => d.connected);
 
   return (
-    <div className="min-h-screen bg-[#F4F5F8] text-[#141416] flex items-center justify-center lg:p-6">
+    <div className="min-h-screen bg-[#F4F5F8] dark:bg-[#0B0D12] text-[#141416] dark:text-[#F4F5F7] flex items-center justify-center lg:p-6 transition-colors">
       <div className="w-full lg:max-w-[980px] flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8">
         {/* Trust Wallet Extension Window */}
         {isMinimized ? (
-          <div className="w-full max-w-[386px] bg-white rounded-[20px] border border-[#E5E7EB] shadow-lg p-6 text-center space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#EEF0FF] mx-auto flex items-center justify-center">
+          <div className="w-full max-w-[386px] bg-white dark:bg-[#14171F] rounded-[20px] border border-[#E5E7EB] dark:border-[#232836] shadow-lg p-6 text-center space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#EEF0FF] dark:bg-[#1E2747] mx-auto flex items-center justify-center">
               <TrustShieldLogo className="w-6 h-7" />
             </div>
             <div>
-              <h2 className="text-[16px] font-bold text-[#141416]">Trust Wallet Minimized</h2>
-              <p className="text-[13px] text-[#717680] mt-1">
+              <h2 className="text-[16px] font-bold text-[#141416] dark:text-[#F4F5F7]">Trust Wallet Minimized</h2>
+              <p className="text-[13px] text-[#717680] dark:text-[#8E95A5] mt-1">
                 Click below to reopen the browser extension popup.
               </p>
             </div>
@@ -592,20 +632,33 @@ export default function App() {
           </div>
         ) : (
           <main
-            className="relative w-full lg:w-[386px] min-h-screen lg:min-h-[652px] lg:h-[652px] bg-white lg:rounded-[18px] lg:border lg:border-[#E2E4E9] lg:shadow-[0_18px_48px_rgba(16,24,40,0.09)] flex flex-col overflow-hidden shrink-0"
+            className="relative w-full lg:w-[386px] min-h-screen lg:min-h-[652px] lg:h-[652px] bg-white dark:bg-[#14171F] lg:rounded-[18px] lg:border lg:border-[#E2E4E9] dark:lg:border-[#232836] lg:shadow-[0_18px_48px_rgba(16,24,40,0.09)] dark:lg:shadow-[0_18px_48px_rgba(0,0,0,0.45)] flex flex-col overflow-hidden shrink-0 transition-colors"
             aria-label="Trust Wallet Extension"
           >
             {/* Top Extension Title Bar */}
-            <header className="px-4 h-[46px] border-b border-[#ECEDF0] flex items-center justify-between shrink-0 bg-white">
+            <header className="px-4 h-[46px] border-b border-[#ECEDF0] dark:border-[#232836] flex items-center justify-between shrink-0 bg-white dark:bg-[#14171F]">
               <div className="flex items-center gap-2">
                 <TrustShieldLogo className="w-[18px] h-[20px]" />
-                <span className="text-[14.5px] font-semibold text-[#141416] tracking-[-0.01em] whitespace-nowrap">
+                <span className="text-[14.5px] font-semibold text-[#141416] dark:text-[#F4F5F7] tracking-[-0.01em] whitespace-nowrap">
                   Trust Wallet
                 </span>
               </div>
 
               <div className="flex items-center gap-1">
                 <PWAInstallButton variant="compact" />
+                <button
+                  type="button"
+                  onClick={handleToggleTheme}
+                  title={theme === 'dark' ? 'Switch to Day Mode' : 'Switch to Night Mode'}
+                  aria-label={theme === 'dark' ? 'Switch to Day Mode' : 'Switch to Night Mode'}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-[#525866] dark:text-[#FACC15] hover:bg-[#F3F4F6] dark:hover:bg-[#1C202B] transition-colors"
+                >
+                  {theme === 'dark' ? (
+                    <Sun className="w-[16px] h-[16px]" strokeWidth={2} />
+                  ) : (
+                    <Moon className="w-[16px] h-[16px]" strokeWidth={1.9} />
+                  )}
+                </button>
                 <button
                   type="button"
                   onClick={() => {
@@ -616,8 +669,8 @@ export default function App() {
                   aria-label={isPinned ? 'Unpin window' : 'Pin window'}
                   className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
                     isPinned
-                      ? 'text-[#0500FF] bg-[#EEF0FF]'
-                      : 'text-[#525866] hover:bg-[#F3F4F6]'
+                      ? 'text-[#0500FF] dark:text-[#6B85FF] bg-[#EEF0FF] dark:bg-[#1E2747]'
+                      : 'text-[#525866] dark:text-[#8E95A5] hover:bg-[#F3F4F6] dark:hover:bg-[#1C202B]'
                   }`}
                 >
                   {isPinned ? (
@@ -631,7 +684,7 @@ export default function App() {
                   onClick={() => setIsMinimized(true)}
                   title="Close extension popup"
                   aria-label="Close extension popup"
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-[#525866] hover:bg-[#F3F4F6] transition-colors"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-[#525866] dark:text-[#8E95A5] hover:bg-[#F3F4F6] dark:hover:bg-[#1C202B] transition-colors"
                 >
                   <X className="w-[17px] h-[17px]" strokeWidth={1.8} />
                 </button>
@@ -639,26 +692,26 @@ export default function App() {
             </header>
 
             {/* Wallet Account & Action Icons Header */}
-            <div className="px-4 pt-3 pb-1 flex items-center justify-between gap-2 shrink-0 bg-white">
+            <div className="px-4 pt-3 pb-1 flex items-center justify-between gap-2 shrink-0 bg-white dark:bg-[#14171F]">
               <button
                 type="button"
                 onClick={() => setActiveModal('accounts')}
                 className="text-left group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0500FF] rounded-lg py-0.5 pr-2 min-w-0"
               >
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[14.5px] font-medium text-[#141416] truncate">
+                  <span className="text-[14.5px] font-medium text-[#141416] dark:text-[#F4F5F7] truncate">
                     {activeAccount.seedGroup}
                   </span>
                   <svg
                     viewBox="0 0 10 6"
-                    className="w-2.5 h-1.5 text-[#7B808C] group-hover:text-[#141416] transition-colors shrink-0"
+                    className="w-2.5 h-1.5 text-[#7B808C] dark:text-[#8E95A5] group-hover:text-[#141416] dark:group-hover:text-[#F4F5F7] transition-colors shrink-0"
                     fill="currentColor"
                     aria-hidden="true"
                   >
                     <path d="M0.8 0.5H9.2L5 5.5L0.8 0.5Z" />
                   </svg>
                 </div>
-                <div className="text-[13px] font-normal text-[#7B808C] leading-tight truncate">
+                <div className="text-[13px] font-normal text-[#7B808C] dark:text-[#8E95A5] leading-tight truncate">
                   {activeAccount.name}
                 </div>
               </button>
@@ -669,11 +722,11 @@ export default function App() {
                   onClick={() => setActiveModal('dapps')}
                   title="Connected dApps"
                   aria-label="Connected dApps"
-                  className="w-[34px] h-[34px] rounded-full border border-dashed border-[#D1D5DB] hover:border-[#9CA3AF] flex items-center justify-center transition-colors"
+                  className="w-[34px] h-[34px] rounded-full border border-dashed border-[#D1D5DB] dark:border-[#353C4E] hover:border-[#9CA3AF] flex items-center justify-center transition-colors"
                 >
                   <span
                     className={`w-[9px] h-[9px] rounded-full ${
-                      hasConnectedDapp ? 'bg-[#16A34A]' : 'bg-[#C4C7CE]'
+                      hasConnectedDapp ? 'bg-[#16A34A]' : 'bg-[#C4C7CE] dark:bg-[#4B5563]'
                     }`}
                   />
                 </button>
@@ -683,7 +736,7 @@ export default function App() {
                   onClick={() => setActiveModal('search')}
                   title="Search assets"
                   aria-label="Search assets"
-                  className="w-[34px] h-[34px] rounded-full bg-[#EFEFF2] hover:bg-[#E4E5EA] flex items-center justify-center text-[#141416] transition-colors"
+                  className="w-[34px] h-[34px] rounded-full bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] flex items-center justify-center text-[#141416] dark:text-[#F4F5F7] transition-colors"
                 >
                   <Search className="w-[17px] h-[17px]" strokeWidth={2} />
                 </button>
@@ -693,7 +746,7 @@ export default function App() {
                   onClick={() => setActiveModal('history')}
                   title="Transaction history"
                   aria-label="Transaction history"
-                  className="w-[34px] h-[34px] rounded-full bg-[#EFEFF2] hover:bg-[#E4E5EA] flex items-center justify-center text-[#141416] transition-colors"
+                  className="w-[34px] h-[34px] rounded-full bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] flex items-center justify-center text-[#141416] dark:text-[#F4F5F7] transition-colors"
                 >
                   <History className="w-[17px] h-[17px]" strokeWidth={2} />
                 </button>
@@ -703,7 +756,7 @@ export default function App() {
                   onClick={() => setActiveModal('settings')}
                   title="Settings"
                   aria-label="Settings"
-                  className="w-[34px] h-[34px] rounded-full bg-[#EFEFF2] hover:bg-[#E4E5EA] flex items-center justify-center text-[#141416] transition-colors"
+                  className="w-[34px] h-[34px] rounded-full bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] flex items-center justify-center text-[#141416] dark:text-[#F4F5F7] transition-colors"
                 >
                   <Settings className="w-[17px] h-[17px]" strokeWidth={2} />
                 </button>
@@ -715,8 +768,8 @@ export default function App() {
                   aria-label="Admin Login"
                   className={`w-[34px] h-[34px] rounded-full flex items-center justify-center transition-colors ${
                     adminSession
-                      ? 'bg-[#ECFDF5] text-[#16A34A] border border-[#A7F3D0]'
-                      : 'bg-[#EFEFF2] hover:bg-[#E4E5EA] text-[#141416]'
+                      ? 'bg-[#ECFDF5] dark:bg-[#052E16] text-[#16A34A] dark:text-[#4ADE80] border border-[#A7F3D0] dark:border-[#166534]'
+                      : 'bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] text-[#141416] dark:text-[#F4F5F7]'
                   }`}
                 >
                   <ShieldCheck className="w-[17px] h-[17px]" strokeWidth={2} />
@@ -787,7 +840,7 @@ export default function App() {
 
             {/* Toast Feedback Banner */}
             {toastMessage && (
-              <div className="absolute bottom-[68px] left-1/2 -translate-x-1/2 z-30 px-3.5 py-2 rounded-xl bg-[#141416] text-white text-[12px] font-medium shadow-lg whitespace-nowrap">
+              <div className="absolute bottom-[68px] left-1/2 -translate-x-1/2 z-30 px-3.5 py-2 rounded-xl bg-[#141416] dark:bg-[#272D3D] text-white text-[12px] font-medium shadow-lg whitespace-nowrap border border-transparent dark:border-[#374056]">
                 {toastMessage}
               </div>
             )}
@@ -795,19 +848,19 @@ export default function App() {
             {/* Bottom Tab Navigation Bar */}
             <nav
               aria-label="Primary navigation"
-              className="h-[60px] border-t border-[#ECEDF0] bg-white grid grid-cols-4 items-center shrink-0"
+              className="h-[60px] border-t border-[#ECEDF0] dark:border-[#232836] bg-white dark:bg-[#14171F] grid grid-cols-4 items-center shrink-0"
             >
               <button
                 type="button"
                 onClick={() => setBottomTab('home')}
-                className="h-full flex flex-col items-center justify-center gap-0.5 focus:outline-none focus-visible:bg-[#F8F9FB]"
+                className="h-full flex flex-col items-center justify-center gap-0.5 focus:outline-none focus-visible:bg-[#F8F9FB] dark:focus-visible:bg-[#1C202B]"
               >
                 <HomeNavIcon active={bottomTab === 'home'} className="w-[21px] h-[21px]" />
                 <span
                   className={`text-[11.5px] leading-none mt-0.5 whitespace-nowrap ${
                     bottomTab === 'home'
-                      ? 'font-semibold text-[#0500FF]'
-                      : 'font-medium text-[#141416]'
+                      ? 'font-semibold text-[#0500FF] dark:text-[#6B85FF]'
+                      : 'font-medium text-[#141416] dark:text-[#F4F5F7]'
                   }`}
                 >
                   Home
@@ -817,19 +870,19 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setBottomTab('trending')}
-                className="h-full flex flex-col items-center justify-center gap-0.5 focus:outline-none focus-visible:bg-[#F8F9FB]"
+                className="h-full flex flex-col items-center justify-center gap-0.5 focus:outline-none focus-visible:bg-[#F8F9FB] dark:focus-visible:bg-[#1C202B]"
               >
                 <TrendingUp
                   className={`w-[20px] h-[20px] ${
-                    bottomTab === 'trending' ? 'text-[#0500FF]' : 'text-[#141416]'
+                    bottomTab === 'trending' ? 'text-[#0500FF] dark:text-[#6B85FF]' : 'text-[#141416] dark:text-[#F4F5F7]'
                   }`}
                   strokeWidth={2}
                 />
                 <span
                   className={`text-[11.5px] leading-none mt-0.5 whitespace-nowrap ${
                     bottomTab === 'trending'
-                      ? 'font-semibold text-[#0500FF]'
-                      : 'font-medium text-[#141416]'
+                      ? 'font-semibold text-[#0500FF] dark:text-[#6B85FF]'
+                      : 'font-medium text-[#141416] dark:text-[#F4F5F7]'
                   }`}
                 >
                   Trending
@@ -839,19 +892,19 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setBottomTab('swap')}
-                className="h-full flex flex-col items-center justify-center gap-0.5 focus:outline-none focus-visible:bg-[#F8F9FB]"
+                className="h-full flex flex-col items-center justify-center gap-0.5 focus:outline-none focus-visible:bg-[#F8F9FB] dark:focus-visible:bg-[#1C202B]"
               >
                 <Repeat2
                   className={`w-[21px] h-[21px] ${
-                    bottomTab === 'swap' ? 'text-[#0500FF]' : 'text-[#141416]'
+                    bottomTab === 'swap' ? 'text-[#0500FF] dark:text-[#6B85FF]' : 'text-[#141416] dark:text-[#F4F5F7]'
                   }`}
                   strokeWidth={2}
                 />
                 <span
                   className={`text-[11.5px] leading-none mt-0.5 whitespace-nowrap ${
                     bottomTab === 'swap'
-                      ? 'font-semibold text-[#0500FF]'
-                      : 'font-medium text-[#141416]'
+                      ? 'font-semibold text-[#0500FF] dark:text-[#6B85FF]'
+                      : 'font-medium text-[#141416] dark:text-[#F4F5F7]'
                   }`}
                 >
                   Swap
@@ -861,19 +914,19 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setBottomTab('earn')}
-                className="h-full flex flex-col items-center justify-center gap-0.5 focus:outline-none focus-visible:bg-[#F8F9FB]"
+                className="h-full flex flex-col items-center justify-center gap-0.5 focus:outline-none focus-visible:bg-[#F8F9FB] dark:focus-visible:bg-[#1C202B]"
               >
                 <Sprout
                   className={`w-[20px] h-[20px] ${
-                    bottomTab === 'earn' ? 'text-[#0500FF]' : 'text-[#141416]'
+                    bottomTab === 'earn' ? 'text-[#0500FF] dark:text-[#6B85FF]' : 'text-[#141416] dark:text-[#F4F5F7]'
                   }`}
                   strokeWidth={2}
                 />
                 <span
                   className={`text-[11.5px] leading-none mt-0.5 whitespace-nowrap ${
                     bottomTab === 'earn'
-                      ? 'font-semibold text-[#0500FF]'
-                      : 'font-medium text-[#141416]'
+                      ? 'font-semibold text-[#0500FF] dark:text-[#6B85FF]'
+                      : 'font-medium text-[#141416] dark:text-[#F4F5F7]'
                   }`}
                 >
                   Earn
@@ -920,6 +973,8 @@ export default function App() {
               preselectedBuyTokenId={preselectedBuyTokenId}
               currency={currency}
               onChangeCurrency={setCurrency}
+              theme={theme}
+              onChangeTheme={handleChangeTheme}
               adminToken={adminToken}
               adminSession={adminSession}
               onAdminAuthChange={handleAdminAuthChange}
@@ -935,6 +990,8 @@ export default function App() {
           transactions={accountTransactions}
           dapps={dapps}
           currency={currency}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
           onRefreshPayments={refreshNow}
           isSyncingPayments={isSyncing}
           onOpenModal={(modal) => {

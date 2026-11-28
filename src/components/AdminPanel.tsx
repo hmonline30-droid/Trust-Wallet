@@ -290,7 +290,7 @@ export function AdminPanel({
 
   if (configured === null) {
     return (
-      <div className="py-8 text-center text-[13px] text-[#717680]">
+      <div className="py-8 text-center text-[13px] text-[#717680] dark:text-[#8E95A5]">
         Checking admin security state...
       </div>
     );
@@ -300,22 +300,22 @@ export function AdminPanel({
     return (
       <div className="space-y-3.5">
         {/* Authenticated Admin Header */}
-        <div className="p-3.5 rounded-2xl bg-[#ECFDF5] border border-[#A7F3D0] flex items-center justify-between gap-2">
+        <div className="p-3.5 rounded-2xl bg-[#ECFDF5] dark:bg-[#052E16] border border-[#A7F3D0] dark:border-[#166534] flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-9 h-9 rounded-xl bg-[#16A34A] text-white flex items-center justify-center shrink-0">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-[13.5px] font-bold text-[#065F46] truncate">
+              <div className="text-[13.5px] font-bold text-[#065F46] dark:text-[#86EFAC] truncate">
                 Admin Authenticated
               </div>
-              <div className="text-[11.5px] text-[#047857] truncate">{adminSession.email}</div>
+              <div className="text-[11.5px] text-[#047857] dark:text-[#4ADE80] truncate">{adminSession.email}</div>
             </div>
           </div>
           <button
             type="button"
             onClick={handleLogout}
-            className="px-3 py-1.5 rounded-xl bg-white border border-[#A7F3D0] text-[#065F46] hover:bg-[#F0FDF4] text-[12px] font-semibold flex items-center gap-1.5 shrink-0"
+            className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#14171F] border border-[#A7F3D0] dark:border-[#166534] text-[#065F46] dark:text-[#86EFAC] hover:bg-[#F0FDF4] dark:hover:bg-[#1C202B] text-[12px] font-semibold flex items-center gap-1.5 shrink-0"
           >
             <LogOut className="w-3.5 h-3.5" />
             Sign Out
@@ -325,21 +325,21 @@ export function AdminPanel({
         {/* Overview KPIs */}
         {overview && (
           <div className="grid grid-cols-3 gap-2">
-            <div className="p-2.5 rounded-xl bg-[#F8F9FB] border border-[#ECEDF0]">
-              <div className="text-[11px] text-[#717680]">Networks</div>
-              <div className="text-[15px] font-bold text-[#141416] tabular-nums">
+            <div className="p-2.5 rounded-xl bg-[#F8F9FB] dark:bg-[#1A1E29] border border-[#ECEDF0] dark:border-[#232836]">
+              <div className="text-[11px] text-[#717680] dark:text-[#8E95A5]">Networks</div>
+              <div className="text-[15px] font-bold text-[#141416] dark:text-[#F4F5F7] tabular-nums">
                 {overview.stats.supportedChains}
               </div>
             </div>
-            <div className="p-2.5 rounded-xl bg-[#F8F9FB] border border-[#ECEDF0]">
-              <div className="text-[11px] text-[#717680]">Hot Wallets</div>
-              <div className="text-[15px] font-bold text-[#141416] tabular-nums">
+            <div className="p-2.5 rounded-xl bg-[#F8F9FB] dark:bg-[#1A1E29] border border-[#ECEDF0] dark:border-[#232836]">
+              <div className="text-[11px] text-[#717680] dark:text-[#8E95A5]">Hot Wallets</div>
+              <div className="text-[15px] font-bold text-[#141416] dark:text-[#F4F5F7] tabular-nums">
                 {overview.stats.hotWalletsReady}
               </div>
             </div>
-            <div className="p-2.5 rounded-xl bg-[#F8F9FB] border border-[#ECEDF0]">
-              <div className="text-[11px] text-[#717680]">Events</div>
-              <div className="text-[15px] font-bold text-[#141416] tabular-nums">
+            <div className="p-2.5 rounded-xl bg-[#F8F9FB] dark:bg-[#1A1E29] border border-[#ECEDF0] dark:border-[#232836]">
+              <div className="text-[11px] text-[#717680] dark:text-[#8E95A5]">Events</div>
+              <div className="text-[15px] font-bold text-[#141416] dark:text-[#F4F5F7] tabular-nums">
                 {overview.stats.trackedEvents}
               </div>
             </div>
@@ -349,9 +349,9 @@ export function AdminPanel({
         {/* Admin Credit Controls */}
         <form
           onSubmit={handleAdminCredit}
-          className="p-3.5 rounded-2xl border border-[#ECEDF0] bg-[#FAFAFC] space-y-2.5"
+          className="p-3.5 rounded-2xl border border-[#ECEDF0] dark:border-[#232836] bg-[#FAFAFC] dark:bg-[#1A1E29] space-y-2.5"
         >
-          <div className="text-[13px] font-bold text-[#141416]">
+          <div className="text-[13px] font-bold text-[#141416] dark:text-[#F4F5F7]">
             Admin Credit ({activeAccount.name})
           </div>
 
@@ -359,7 +359,7 @@ export function AdminPanel({
             <select
               value={creditTokenId}
               onChange={(e) => setCreditTokenId(e.target.value)}
-              className="px-2.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[12.5px] font-semibold text-[#141416]"
+              className="px-2.5 py-2 rounded-xl bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[12.5px] font-semibold text-[#141416] dark:text-[#F4F5F7]"
             >
               {tokens.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -375,7 +375,7 @@ export function AdminPanel({
               value={creditAmount}
               onChange={(e) => setCreditAmount(e.target.value)}
               placeholder="Amount"
-              className="px-2.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[13px] font-bold text-[#141416] tabular-nums"
+              className="px-2.5 py-2 rounded-xl bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[13px] font-bold text-[#141416] dark:text-[#F4F5F7] tabular-nums"
             />
           </div>
 
@@ -384,7 +384,7 @@ export function AdminPanel({
             value={creditFromAddr}
             onChange={(e) => setCreditFromAddr(e.target.value)}
             placeholder="Sender address"
-            className="w-full px-2.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[11.5px] font-mono text-[#141416]"
+            className="w-full px-2.5 py-2 rounded-xl bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[11.5px] font-mono text-[#141416] dark:text-[#F4F5F7]"
           />
 
           <div className="flex gap-2">
@@ -400,7 +400,7 @@ export function AdminPanel({
               type="button"
               disabled={actionBusy}
               onClick={handleAdminReset}
-              className="px-3.5 h-10 rounded-xl bg-[#FEE2E2] hover:bg-[#FECACA] text-[#B91C1C] text-[12.5px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
+              className="px-3.5 h-10 rounded-xl bg-[#FEE2E2] dark:bg-[#450A0A] hover:bg-[#FECACA] dark:hover:bg-[#7F1D1D] text-[#B91C1C] dark:text-[#FCA5A5] text-[12.5px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               Zero
@@ -408,7 +408,7 @@ export function AdminPanel({
           </div>
 
           {actionFeedback && (
-            <div className="flex items-center gap-1.5 text-[12px] font-medium text-[#065F46]">
+            <div className="flex items-center gap-1.5 text-[12px] font-medium text-[#065F46] dark:text-[#86EFAC]">
               <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
               <span>{actionFeedback}</span>
             </div>
@@ -422,30 +422,30 @@ export function AdminPanel({
   if (!configured) {
     return (
       <form onSubmit={handleSetupSubmit} className="space-y-3">
-        <div className="p-3.5 rounded-2xl bg-[#EEF0FF] border border-[#D4D8FF] flex items-start gap-2.5">
-          <KeyRound className="w-5 h-5 text-[#0500FF] shrink-0 mt-0.5" />
-          <div className="text-[12px] text-[#1E1B4B] leading-relaxed">
+        <div className="p-3.5 rounded-2xl bg-[#EEF0FF] dark:bg-[#1E2747] border border-[#D4D8FF] dark:border-[#2F3D6B] flex items-start gap-2.5">
+          <KeyRound className="w-5 h-5 text-[#0500FF] dark:text-[#8FA4FF] shrink-0 mt-0.5" />
+          <div className="text-[12px] text-[#1E1B4B] dark:text-[#DCE3FF] leading-relaxed">
             <strong className="font-semibold block mb-0.5">First-Run Admin Setup</strong>
             Choose your admin password to activate the Admin Console, or configure{' '}
-            <code className="font-mono bg-white/80 px-1 rounded">ADMIN_PASSCODE</code> in Settings
+            <code className="font-mono bg-white/80 dark:bg-[#14171F] px-1 rounded">ADMIN_PASSCODE</code> in Settings
             → Secrets.
           </div>
         </div>
 
         <div>
-          <label className="block text-[12px] font-medium text-[#717680] mb-1">Admin Email</label>
+          <label className="block text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] mb-1">Admin Email</label>
           <input
             type="email"
             required
             value={emailInput}
             onChange={(e) => setEmailInput(e.target.value)}
             placeholder="admin@trustwallet.local"
-            className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[13px] text-[#141416] focus:outline-none focus:border-[#0500FF]"
+            className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[13px] text-[#141416] dark:text-[#F4F5F7] focus:outline-none focus:border-[#0500FF]"
           />
         </div>
 
         <div>
-          <label className="block text-[12px] font-medium text-[#717680] mb-1">
+          <label className="block text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] mb-1">
             Create Admin Password (min 8 chars)
           </label>
           <input
@@ -455,12 +455,12 @@ export function AdminPanel({
             value={passwordInput}
             onChange={(e) => setPasswordInput(e.target.value)}
             placeholder="Enter strong password"
-            className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[13px] text-[#141416] focus:outline-none focus:border-[#0500FF]"
+            className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[13px] text-[#141416] dark:text-[#F4F5F7] focus:outline-none focus:border-[#0500FF]"
           />
         </div>
 
         <div>
-          <label className="block text-[12px] font-medium text-[#717680] mb-1">
+          <label className="block text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] mb-1">
             Confirm Password
           </label>
           <input
@@ -470,12 +470,12 @@ export function AdminPanel({
             value={confirmPasswordInput}
             onChange={(e) => setConfirmPasswordInput(e.target.value)}
             placeholder="Re-enter password"
-            className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[13px] text-[#141416] focus:outline-none focus:border-[#0500FF]"
+            className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[13px] text-[#141416] dark:text-[#F4F5F7] focus:outline-none focus:border-[#0500FF]"
           />
         </div>
 
         {authError && (
-          <div className="text-[12px] font-medium text-[#DC2626] bg-[#FEF2F2] border border-[#FECACA] px-3 py-2 rounded-xl">
+          <div className="text-[12px] font-medium text-[#DC2626] dark:text-[#FCA5A5] bg-[#FEF2F2] dark:bg-[#450A0A] border border-[#FECACA] dark:border-[#7F1D1D] px-3 py-2 rounded-xl">
             {authError}
           </div>
         )}
@@ -495,13 +495,13 @@ export function AdminPanel({
   // Standard Admin Sign In Form
   return (
     <form onSubmit={handleLoginSubmit} className="space-y-3">
-      <div className="p-3.5 rounded-2xl bg-[#F8F9FB] border border-[#ECEDF0] flex items-center gap-2.5">
-        <div className="w-9 h-9 rounded-xl bg-[#141416] text-white flex items-center justify-center shrink-0">
+      <div className="p-3.5 rounded-2xl bg-[#F8F9FB] dark:bg-[#1A1E29] border border-[#ECEDF0] dark:border-[#232836] flex items-center gap-2.5">
+        <div className="w-9 h-9 rounded-xl bg-[#141416] dark:bg-[#0500FF] text-white flex items-center justify-center shrink-0">
           <Lock className="w-4 h-4" />
         </div>
         <div>
-          <div className="text-[13.5px] font-bold text-[#141416]">Admin Login</div>
-          <div className="text-[11.5px] text-[#717680]">
+          <div className="text-[13.5px] font-bold text-[#141416] dark:text-[#F4F5F7]">Admin Login</div>
+          <div className="text-[11.5px] text-[#717680] dark:text-[#8E95A5]">
             {envConfigured
               ? 'Protected by server ADMIN_PASSCODE'
               : 'Sign in with your claimed admin password'}
@@ -510,19 +510,19 @@ export function AdminPanel({
       </div>
 
       <div>
-        <label className="block text-[12px] font-medium text-[#717680] mb-1">Admin Email</label>
+        <label className="block text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] mb-1">Admin Email</label>
         <input
           type="email"
           required
           value={emailInput}
           onChange={(e) => setEmailInput(e.target.value)}
           placeholder="admin@trustwallet.local"
-          className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[13px] text-[#141416] focus:outline-none focus:border-[#0500FF]"
+          className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[13px] text-[#141416] dark:text-[#F4F5F7] focus:outline-none focus:border-[#0500FF]"
         />
       </div>
 
       <div>
-        <label className="block text-[12px] font-medium text-[#717680] mb-1">
+        <label className="block text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] mb-1">
           Admin Password
         </label>
         <input
@@ -531,12 +531,12 @@ export function AdminPanel({
           value={passwordInput}
           onChange={(e) => setPasswordInput(e.target.value)}
           placeholder="Enter admin password"
-          className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[13px] text-[#141416] focus:outline-none focus:border-[#0500FF]"
+          className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[13px] text-[#141416] dark:text-[#F4F5F7] focus:outline-none focus:border-[#0500FF]"
         />
       </div>
 
       {authError && (
-        <div className="text-[12px] font-medium text-[#DC2626] bg-[#FEF2F2] border border-[#FECACA] px-3 py-2 rounded-xl">
+        <div className="text-[12px] font-medium text-[#DC2626] dark:text-[#FCA5A5] bg-[#FEF2F2] dark:bg-[#450A0A] border border-[#FECACA] dark:border-[#7F1D1D] px-3 py-2 rounded-xl">
           {authError}
         </div>
       )}

@@ -45,7 +45,7 @@ export const PWAInstallButton: React.FC<{ variant?: 'compact' | 'card' }> = ({
         <button
           type="button"
           onClick={() => setShowGuide(true)}
-          className="w-full h-11 rounded-xl bg-[#EEF0FF] hover:bg-[#E0E4FF] text-[#0500FF] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors"
+          className="w-full h-11 rounded-xl bg-[#EEF0FF] dark:bg-[#1E2747] hover:bg-[#E0E4FF] dark:hover:bg-[#27335D] text-[#0500FF] dark:text-[#8FA4FF] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors"
         >
           <Smartphone className="w-4 h-4" />
           {isIOS ? 'Install on iPhone / iPad' : 'Install as Android App (WebAPK)'}
@@ -56,7 +56,7 @@ export const PWAInstallButton: React.FC<{ variant?: 'compact' | 'card' }> = ({
           onClick={() => setShowGuide(true)}
           title="Install Mobile App"
           aria-label="Install Mobile App"
-          className="w-8 h-8 rounded-full flex items-center justify-center text-[#0500FF] hover:bg-[#EEF0FF] transition-colors"
+          className="w-8 h-8 rounded-full flex items-center justify-center text-[#0500FF] dark:text-[#6B85FF] hover:bg-[#EEF0FF] dark:hover:bg-[#1E2747] transition-colors"
         >
           <Download className="w-[16px] h-[16px]" strokeWidth={2} />
         </button>
@@ -64,23 +64,23 @@ export const PWAInstallButton: React.FC<{ variant?: 'compact' | 'card' }> = ({
 
       {showGuide && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl border border-[#E5E7EB]">
+          <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-[#14171F] p-5 shadow-2xl border border-[#E5E7EB] dark:border-[#232836]">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-[16px] font-bold text-[#141416]">
+              <h3 className="text-[16px] font-bold text-[#141416] dark:text-[#F4F5F7]">
                 {isIOS ? 'Install on iPhone / iPad' : 'Install Android App / Export APK'}
               </h3>
               <button
                 type="button"
                 onClick={() => setShowGuide(false)}
                 aria-label="Close install guide"
-                className="w-7 h-7 rounded-full bg-[#EFEFF2] flex items-center justify-center text-[#141416]"
+                className="w-7 h-7 rounded-full bg-[#EFEFF2] dark:bg-[#1C202B] flex items-center justify-center text-[#141416] dark:text-[#F4F5F7]"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
 
             {isIOS ? (
-              <ol className="text-[13px] text-[#525866] space-y-2 list-decimal pl-4">
+              <ol className="text-[13px] text-[#525866] dark:text-[#9CA3AF] space-y-2 list-decimal pl-4">
                 <li>
                   Open this URL in <strong>Safari</strong> on iPhone or iPad.
                 </li>
@@ -92,16 +92,16 @@ export const PWAInstallButton: React.FC<{ variant?: 'compact' | 'card' }> = ({
                 </li>
               </ol>
             ) : (
-              <div className="text-[13px] text-[#525866] space-y-2.5">
+              <div className="text-[13px] text-[#525866] dark:text-[#9CA3AF] space-y-2.5">
                 <p>
-                  <strong className="text-[#141416]">1. Direct Android Install (WebAPK):</strong>{' '}
+                  <strong className="text-[#141416] dark:text-[#F4F5F7]">1. Direct Android Install (WebAPK):</strong>{' '}
                   Open the app URL in Chrome on Android, tap the <strong>⋮</strong> menu, and
                   choose <strong>Add to Home screen → Install app</strong>.
                 </p>
                 <p>
-                  <strong className="text-[#141416]">2. Signed .APK File:</strong> Copy the live
+                  <strong className="text-[#141416] dark:text-[#F4F5F7]">2. Signed .APK File:</strong> Copy the live
                   Shared App URL into{' '}
-                  <span className="font-mono text-[#0500FF]">pwabuilder.com</span> and choose{' '}
+                  <span className="font-mono text-[#0500FF] dark:text-[#6B85FF]">pwabuilder.com</span> and choose{' '}
                   <strong>Package for Android</strong> to download an installable{' '}
                   <span className="font-mono">.apk</span>.
                 </p>
@@ -111,7 +111,7 @@ export const PWAInstallButton: React.FC<{ variant?: 'compact' | 'card' }> = ({
             <button
               type="button"
               onClick={() => setShowGuide(false)}
-              className="mt-4 w-full h-10 rounded-xl bg-[#141416] hover:bg-[#27272A] text-white text-[13px] font-semibold transition-colors"
+              className="mt-4 w-full h-10 rounded-xl bg-[#141416] dark:bg-[#0500FF] hover:bg-[#27272A] dark:hover:bg-[#0400D6] text-white text-[13px] font-semibold transition-colors"
             >
               Got it
             </button>

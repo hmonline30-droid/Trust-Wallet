@@ -19,6 +19,8 @@ import {
   Clock,
   RefreshCw,
   Trash2,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import {
   ActiveModal,
@@ -77,6 +79,8 @@ interface WalletModalsProps {
   preselectedBuyTokenId: string;
   currency: 'USD' | 'EUR';
   onChangeCurrency: (curr: 'USD' | 'EUR') => void;
+  theme: 'light' | 'dark';
+  onChangeTheme: (theme: 'light' | 'dark') => void;
   adminToken: string | null;
   adminSession: AdminSession | null;
   onAdminAuthChange: (token: string | null, session: AdminSession | null) => void;
@@ -156,12 +160,15 @@ export function WalletModals({
   preselectedBuyTokenId,
   currency,
   onChangeCurrency,
+  theme,
+  onChangeTheme,
   adminToken,
   adminSession,
   onAdminAuthChange,
   onNotify,
 }: WalletModalsProps) {
   const [receiveNet, setReceiveNet] = useState<Exclude<NetworkId, 'all'> | null>(null);
+  const [pendingReceiveNet, setPendingReceiveNet] = useState<Exclude<NetworkId, 'all'> | null>(null);
   const [networkSearch, setNetworkSearch] = useState('');
   const [copiedNetId, setCopiedNetId] = useState<string | null>(null);
   const [copiedAddr, setCopiedAddr] = useState(false);
@@ -212,11 +219,16 @@ export function WalletModals({
       setShowTxTracker(false);
       setTrackError(null);
     }
-    if (activeModal !== 'receive') {
+    if (activeModal === 'receive') {
+      if (pendingReceiveNet) {
+        setReceiveNet(pendingReceiveNet);
+        setPendingReceiveNet(null);
+      }
+    } else {
       setReceiveNet(null);
       setNetworkSearch('');
     }
-  }, [activeModal]);
+  }, [activeModal, pendingReceiveNet]);
 
   if (!activeModal) return null;
 
@@ -313,24 +325,28 @@ export function WalletModals({
             setSelectedTxId(null);
             onClearFocusedTx?.();
           }}
-          className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-[#0500FF] hover:underline"
+          className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-[#0500FF] dark:text-[#6B85FF] hover:underline"
         >
           <ChevronLeft className="w-4 h-4" />
           Back to list
         </button>
 
-        <div className="p-4 rounded-2xl bg-[#F8F9FB] border border-[#ECEDF0] text-center">
+        <div className="p-4 rounded-2xl bg-[#F8F9FB] dark:bg-[#1A1E29] border border-[#ECEDF0] dark:border-[#232836] text-center">
           <div
             className={`text-[24px] font-bold tabular-nums ${
-              isPending ? 'text-[#D97706]' : isOutgoing ? 'text-[#141416]' : 'text-[#16A34A]'
+              isPending
+                ? 'text-[#D97706] dark:text-[#FBBF24]'
+                : isOutgoing
+                  ? 'text-[#141416] dark:text-[#F4F5F7]'
+                  : 'text-[#16A34A] dark:text-[#4ADE80]'
             }`}
           >
             {tx.amountText}
           </div>
-          <div className="text-[13px] text-[#717680] tabular-nums mt-0.5">{tx.usdText}</div>
+          <div className="text-[13px] text-[#717680] dark:text-[#8E95A5] tabular-nums mt-0.5">{tx.usdText}</div>
           <div
             className={`mt-2 inline-flex items-center gap-1.5 text-[12px] font-semibold ${
-              isPending ? 'text-[#D97706]' : 'text-[#16A34A]'
+              isPending ? 'text-[#D97706] dark:text-[#FBBF24]' : 'text-[#16A34A] dark:text-[#4ADE80]'
             }`}
           >
             {isPending ? <Clock className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
@@ -340,38 +356,38 @@ export function WalletModals({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#ECEDF0] divide-y divide-[#F1F2F5] text-[12.5px]">
+        <div className="rounded-2xl border border-[#ECEDF0] dark:border-[#232836] divide-y divide-[#F1F2F5] dark:divide-[#232836] text-[12.5px]">
           <div className="px-3.5 py-2.5 flex items-center justify-between gap-3">
-            <span className="text-[#717680]">Date</span>
-            <span className="font-medium text-[#141416]">{tx.timestamp}</span>
+            <span className="text-[#717680] dark:text-[#8E95A5]">Date</span>
+            <span className="font-medium text-[#141416] dark:text-[#F4F5F7]">{tx.timestamp}</span>
           </div>
           <div className="px-3.5 py-2.5 flex items-center justify-between gap-3">
-            <span className="text-[#717680]">Network</span>
-            <span className="font-medium text-[#141416]">{net?.name ?? tx.network}</span>
+            <span className="text-[#717680] dark:text-[#8E95A5]">Network</span>
+            <span className="font-medium text-[#141416] dark:text-[#F4F5F7]">{net?.name ?? tx.network}</span>
           </div>
           {tx.counterparty && (
             <div className="px-3.5 py-2.5 flex items-center justify-between gap-3">
-              <span className="text-[#717680] shrink-0">
+              <span className="text-[#717680] dark:text-[#8E95A5] shrink-0">
                 {isOutgoing ? 'Recipient' : 'Sender'}
               </span>
-              <span className="font-mono text-[11.5px] text-[#141416] truncate">
+              <span className="font-mono text-[11.5px] text-[#141416] dark:text-[#F4F5F7] truncate">
                 {tx.counterparty}
               </span>
             </div>
           )}
           {tx.feeText && (
             <div className="px-3.5 py-2.5 flex items-center justify-between gap-3">
-              <span className="text-[#717680]">Network Fee</span>
-              <span className="font-medium text-[#141416] tabular-nums">{tx.feeText}</span>
+              <span className="text-[#717680] dark:text-[#8E95A5]">Network Fee</span>
+              <span className="font-medium text-[#141416] dark:text-[#F4F5F7] tabular-nums">{tx.feeText}</span>
             </div>
           )}
           {tx.txHash && (
             <div className="px-3.5 py-2.5 flex items-center justify-between gap-3">
-              <span className="text-[#717680] shrink-0">Tx Hash</span>
+              <span className="text-[#717680] dark:text-[#8E95A5] shrink-0">Tx Hash</span>
               <button
                 type="button"
                 onClick={() => handleCopyText(tx.txHash!, 'hash')}
-                className="inline-flex items-center gap-1.5 font-mono text-[11.5px] text-[#0500FF] hover:underline truncate"
+                className="inline-flex items-center gap-1.5 font-mono text-[11.5px] text-[#0500FF] dark:text-[#6B85FF] hover:underline truncate"
               >
                 <span className="truncate">{tx.txHash.slice(0, 12)}...{tx.txHash.slice(-8)}</span>
                 {copiedHash ? <Check className="w-3.5 h-3.5 shrink-0" /> : <Copy className="w-3.5 h-3.5 shrink-0" />}
@@ -391,16 +407,16 @@ export function WalletModals({
         key={tx.id}
         type="button"
         onClick={() => setSelectedTxId(tx.id)}
-        className="w-full p-3 rounded-2xl border border-[#ECEDF0] hover:bg-[#F8F9FB] transition-colors flex items-center justify-between gap-2 text-left"
+        className="w-full p-3 rounded-2xl border border-[#ECEDF0] dark:border-[#232836] hover:bg-[#F8F9FB] dark:hover:bg-[#1C202B] transition-colors flex items-center justify-between gap-2 text-left"
       >
         <div className="flex items-center gap-2.5 min-w-0">
           <div
             className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
               isPending
-                ? 'bg-[#FEF3C7] text-[#D97706]'
+                ? 'bg-[#FEF3C7] dark:bg-[#3A2B12] text-[#D97706] dark:text-[#FBBF24]'
                 : isOutgoing
-                  ? 'bg-[#FEF2F2] text-[#DC2626]'
-                  : 'bg-[#ECFDF5] text-[#16A34A]'
+                  ? 'bg-[#FEF2F2] dark:bg-[#3A1A1D] text-[#DC2626] dark:text-[#F87171]'
+                  : 'bg-[#ECFDF5] dark:bg-[#133323] text-[#16A34A] dark:text-[#4ADE80]'
             }`}
           >
             {isPending ? (
@@ -412,10 +428,10 @@ export function WalletModals({
             )}
           </div>
           <div className="min-w-0">
-            <div className="text-[13.5px] font-semibold text-[#141416] truncate">
+            <div className="text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7] truncate">
               {tx.title}
             </div>
-            <div className="text-[11.5px] text-[#717680] truncate">
+            <div className="text-[11.5px] text-[#717680] dark:text-[#8E95A5] truncate">
               {tx.subtitle} · {tx.timestamp}
             </div>
           </div>
@@ -424,15 +440,15 @@ export function WalletModals({
           <div
             className={`text-[13.5px] font-semibold ${
               isPending
-                ? 'text-[#D97706]'
+                ? 'text-[#D97706] dark:text-[#FBBF24]'
                 : isOutgoing
-                  ? 'text-[#DC2626]'
-                  : 'text-[#16A34A]'
+                  ? 'text-[#DC2626] dark:text-[#F87171]'
+                  : 'text-[#16A34A] dark:text-[#4ADE80]'
             }`}
           >
             {tx.amountText}
           </div>
-          <div className="text-[11.5px] text-[#717680]">{tx.usdText}</div>
+          <div className="text-[11.5px] text-[#717680] dark:text-[#8E95A5]">{tx.usdText}</div>
         </div>
       </button>
     );
@@ -459,7 +475,7 @@ export function WalletModals({
       return (
         <div
           key={net.id}
-          className="flex items-center justify-between py-2.5 px-1.5 -mx-1.5 rounded-2xl hover:bg-[#F7F8FA] transition-colors"
+          className="flex items-center justify-between py-2.5 px-1.5 -mx-1.5 rounded-2xl hover:bg-[#F7F8FA] dark:hover:bg-[#1C202B] transition-colors"
         >
           <button
             type="button"
@@ -468,10 +484,10 @@ export function WalletModals({
           >
             <NetworkLogoIcon networkId={net.id} className="w-9 h-9" />
             <div className="min-w-0">
-              <div className="text-[15px] font-medium text-[#141416] leading-tight truncate">
+              <div className="text-[15px] font-medium text-[#141416] dark:text-[#F4F5F7] leading-tight truncate">
                 {net.name}
               </div>
-              <div className="text-[13px] text-[#717680] leading-tight mt-0.5 tabular-nums truncate">
+              <div className="text-[13px] text-[#717680] dark:text-[#8E95A5] leading-tight mt-0.5 tabular-nums truncate">
                 {formatShortAddress(fullAddr)}
               </div>
             </div>
@@ -483,7 +499,7 @@ export function WalletModals({
               onClick={() => setReceiveNet(net.id)}
               title={`Show ${net.name} QR code`}
               aria-label={`Show ${net.name} QR code`}
-              className="w-9 h-9 rounded-full hover:bg-[#EFEFF2] flex items-center justify-center text-[#141416] transition-colors"
+              className="w-9 h-9 rounded-full hover:bg-[#EFEFF2] dark:hover:bg-[#252A38] flex items-center justify-center text-[#141416] dark:text-[#F4F5F7] transition-colors"
             >
               <QrCode className="w-[18px] h-[18px]" strokeWidth={1.9} />
             </button>
@@ -492,10 +508,10 @@ export function WalletModals({
               onClick={() => handleCopyNetworkRow(net.id, fullAddr)}
               title={`Copy ${net.name} address`}
               aria-label={`Copy ${net.name} address`}
-              className="w-9 h-9 rounded-full hover:bg-[#EFEFF2] flex items-center justify-center text-[#7B808C] hover:text-[#141416] transition-colors"
+              className="w-9 h-9 rounded-full hover:bg-[#EFEFF2] dark:hover:bg-[#252A38] flex items-center justify-center text-[#7B808C] dark:text-[#8E95A5] hover:text-[#141416] dark:hover:text-[#F4F5F7] transition-colors"
             >
               {isCopied ? (
-                <Check className="w-[18px] h-[18px] text-[#16A34A]" strokeWidth={2.2} />
+                <Check className="w-[18px] h-[18px] text-[#16A34A] dark:text-[#4ADE80]" strokeWidth={2.2} />
               ) : (
                 <Copy className="w-[17px] h-[17px]" strokeWidth={1.9} />
               )}
@@ -507,7 +523,7 @@ export function WalletModals({
 
     return (
       <div
-        className="absolute inset-0 z-40 bg-white flex flex-col animate-[slideUp_160ms_cubic-bezier(0.16,1,0.3,1)]"
+        className="absolute inset-0 z-40 bg-white dark:bg-[#14171F] flex flex-col animate-[slideUp_160ms_cubic-bezier(0.16,1,0.3,1)] transition-colors"
         role="dialog"
         aria-modal="true"
         aria-label={activeReceiveInfo ? `Receive ${activeReceiveInfo.name}` : 'Select network'}
@@ -524,12 +540,12 @@ export function WalletModals({
               }
             }}
             aria-label="Go back"
-            className="w-9 h-9 rounded-[11px] bg-[#EFEFF5] hover:bg-[#E4E5EE] flex items-center justify-center text-[#7B808C] hover:text-[#141416] transition-colors"
+            className="w-9 h-9 rounded-[11px] bg-[#EFEFF5] dark:bg-[#1C202B] hover:bg-[#E4E5EE] dark:hover:bg-[#252A38] flex items-center justify-center text-[#7B808C] dark:text-[#8E95A5] hover:text-[#141416] dark:hover:text-[#F4F5F7] transition-colors"
           >
             <ArrowLeft className="w-[18px] h-[18px]" strokeWidth={2.1} />
           </button>
 
-          <h3 className="text-[16px] font-bold text-[#141416] tracking-[-0.01em]">
+          <h3 className="text-[16px] font-bold text-[#141416] dark:text-[#F4F5F7] tracking-[-0.01em]">
             {activeReceiveInfo ? `Receive ${activeReceiveInfo.name}` : 'Select network'}
           </h3>
 
@@ -540,14 +556,14 @@ export function WalletModals({
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Search Pill */}
             <div className="px-4 pt-1 pb-3 shrink-0">
-              <div className="h-[40px] rounded-full bg-[#EFEFF2] px-3.5 flex items-center gap-2.5">
-                <Search className="w-[17px] h-[17px] text-[#7B808C] shrink-0" strokeWidth={2} />
+              <div className="h-[40px] rounded-full bg-[#EFEFF2] dark:bg-[#1C202B] px-3.5 flex items-center gap-2.5">
+                <Search className="w-[17px] h-[17px] text-[#7B808C] dark:text-[#8E95A5] shrink-0" strokeWidth={2} />
                 <input
                   type="text"
                   value={networkSearch}
                   onChange={(e) => setNetworkSearch(e.target.value)}
                   placeholder="Search for network"
-                  className="w-full bg-transparent text-[14px] text-[#141416] placeholder:text-[#8E939E] focus:outline-none"
+                  className="w-full bg-transparent text-[14px] text-[#141416] dark:text-[#F4F5F7] placeholder:text-[#8E939E] dark:placeholder:text-[#6B7280] focus:outline-none"
                 />
               </div>
             </div>
@@ -556,7 +572,7 @@ export function WalletModals({
             <div className="flex-1 overflow-y-auto wallet-scroll px-4 pb-4">
               {popularNetworks.length > 0 && (
                 <div>
-                  <div className="text-[13px] font-medium text-[#7B808C] mb-2">
+                  <div className="text-[13px] font-medium text-[#7B808C] dark:text-[#8E95A5] mb-2">
                     Popular networks
                   </div>
                   <div className="space-y-1">
@@ -567,7 +583,7 @@ export function WalletModals({
 
               {azNetworks.length > 0 && (
                 <div className={popularNetworks.length > 0 ? 'mt-4' : ''}>
-                  <div className="text-[13px] font-medium text-[#7B808C] mb-2">
+                  <div className="text-[13px] font-medium text-[#7B808C] dark:text-[#8E95A5] mb-2">
                     A-Z networks
                   </div>
                   <div className="space-y-1">
@@ -577,7 +593,7 @@ export function WalletModals({
               )}
 
               {matchingNetworks.length === 0 && (
-                <div className="py-10 text-center text-[13px] text-[#717680]">
+                <div className="py-10 text-center text-[13px] text-[#717680] dark:text-[#8E95A5]">
                   No matching networks found.
                 </div>
               )}
@@ -585,17 +601,26 @@ export function WalletModals({
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto wallet-scroll p-4 space-y-4">
-            <div className="p-5 rounded-2xl border border-[#ECEDF0] bg-[#FAFAFC] flex flex-col items-center">
+            <div className="p-5 rounded-2xl border border-[#ECEDF0] dark:border-[#232836] bg-[#FAFAFC] dark:bg-[#1A1E29] flex flex-col items-center">
               <div className="flex items-center gap-2 mb-3">
                 <NetworkLogoIcon networkId={receiveNet} className="w-6 h-6" />
-                <span className="text-[13.5px] font-semibold text-[#141416]">
+                <span className="text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7]">
                   {activeReceiveInfo?.name} Address
                 </span>
               </div>
-              <div className="p-3 bg-white rounded-2xl border border-[#ECEDF0] shadow-xs">
-                <QrMatrixSvg seed={receiveAddress} />
+              <div className="p-3 bg-white rounded-2xl border border-[#ECEDF0] dark:border-[#2D3343] shadow-xs">
+                {receiveNet === 'ethereum' &&
+                receiveAddress.toLowerCase() === '0x4b8f8e6b5017eac6a6fda7499fc935a15118e9e6' ? (
+                  <img
+                    src="/assets/aistudio/image_855a5dc4.png"
+                    alt={`Ethereum QR code for ${receiveAddress}`}
+                    className="w-44 h-44 object-contain rounded-lg select-none"
+                  />
+                ) : (
+                  <QrMatrixSvg seed={receiveAddress} />
+                )}
               </div>
-              <p className="mt-3.5 text-[12px] font-mono text-[#141416] break-all text-center px-2">
+              <p className="mt-3.5 text-[12px] font-mono text-[#141416] dark:text-[#F4F5F7] break-all text-center px-2">
                 {receiveAddress}
               </p>
               <button
@@ -621,7 +646,7 @@ export function WalletModals({
                 );
                 onClose();
               }}
-              className="w-full h-11 rounded-xl bg-[#EEF0FF] hover:bg-[#E0E4FF] text-[#0500FF] text-[13px] font-semibold transition-colors"
+              className="w-full h-11 rounded-xl bg-[#EEF0FF] dark:bg-[#1E2747] hover:bg-[#E0E4FF] dark:hover:bg-[#27335C] text-[#0500FF] dark:text-[#8FA4FF] text-[13px] font-semibold transition-colors"
             >
               Simulate Incoming Transfer
             </button>
@@ -633,22 +658,22 @@ export function WalletModals({
 
   return (
     <div
-      className="absolute inset-0 z-40 bg-black/40 backdrop-blur-[2px] flex flex-col justify-end"
+      className="absolute inset-0 z-40 bg-black/40 dark:bg-black/65 backdrop-blur-[2px] flex flex-col justify-end"
       role="dialog"
       aria-modal="true"
       aria-label={modalTitleMap[activeModal]}
     >
-      <div className="bg-white rounded-t-[24px] max-h-[88%] flex flex-col shadow-2xl border-t border-[#E8EAEE] animate-[slideUp_180ms_cubic-bezier(0.16,1,0.3,1)]">
+      <div className="bg-white dark:bg-[#14171F] rounded-t-[24px] max-h-[88%] flex flex-col shadow-2xl border-t border-[#E8EAEE] dark:border-[#232836] animate-[slideUp_180ms_cubic-bezier(0.16,1,0.3,1)] transition-colors">
         {/* Sheet Header */}
-        <div className="px-4 pt-2.5 pb-3 border-b border-[#ECEDF0] flex items-center justify-between shrink-0">
-          <h3 className="text-[16px] font-bold text-[#141416] tracking-tight truncate pr-2">
+        <div className="px-4 pt-2.5 pb-3 border-b border-[#ECEDF0] dark:border-[#232836] flex items-center justify-between shrink-0">
+          <h3 className="text-[16px] font-bold text-[#141416] dark:text-[#F4F5F7] tracking-tight truncate pr-2">
             {modalTitleMap[activeModal]}
           </h3>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close modal"
-            className="w-8 h-8 rounded-full bg-[#EFEFF2] hover:bg-[#E4E5EA] flex items-center justify-center text-[#141416] transition-colors shrink-0"
+            className="w-8 h-8 rounded-full bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] flex items-center justify-center text-[#141416] dark:text-[#F4F5F7] transition-colors shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -670,8 +695,8 @@ export function WalletModals({
                       key={acc.id}
                       className={`w-full p-3.5 rounded-2xl border flex items-center justify-between gap-2 transition-colors ${
                         isCurrent
-                          ? 'border-[#0500FF] bg-[#F5F7FF]'
-                          : 'border-[#ECEDF0] bg-white hover:bg-[#F8F9FB]'
+                          ? 'border-[#0500FF] dark:border-[#6B85FF] bg-[#F5F7FF] dark:bg-[#1B2138]'
+                          : 'border-[#ECEDF0] dark:border-[#232836] bg-white dark:bg-[#1A1E29] hover:bg-[#F8F9FB] dark:hover:bg-[#222736]'
                       }`}
                     >
                       <button
@@ -683,18 +708,18 @@ export function WalletModals({
                         className="flex-1 min-w-0 text-left flex items-center justify-between gap-2"
                       >
                         <div className="min-w-0">
-                          <div className="text-[12px] text-[#717680]">{acc.seedGroup}</div>
-                          <div className="text-[14.5px] font-bold text-[#141416] truncate">{acc.name}</div>
-                          <div className="text-[11.5px] font-mono text-[#717680] mt-0.5">
+                          <div className="text-[12px] text-[#717680] dark:text-[#8E95A5]">{acc.seedGroup}</div>
+                          <div className="text-[14.5px] font-bold text-[#141416] dark:text-[#F4F5F7] truncate">{acc.name}</div>
+                          <div className="text-[11.5px] font-mono text-[#717680] dark:text-[#8E95A5] mt-0.5">
                             {acc.addresses.ethereum.slice(0, 8)}...{acc.addresses.ethereum.slice(-6)}
                           </div>
                         </div>
                         <div className="text-right tabular-nums shrink-0">
-                          <div className="text-[14px] font-bold text-[#141416]">
+                          <div className="text-[14px] font-bold text-[#141416] dark:text-[#F4F5F7]">
                             ${totalUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </div>
                           {isCurrent && (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0500FF]">
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0500FF] dark:text-[#6B85FF]">
                               <Check className="w-3 h-3" /> Active
                             </span>
                           )}
@@ -706,7 +731,7 @@ export function WalletModals({
                           onClick={() => onDeleteAccount(acc.id)}
                           title={`Delete ${acc.name}`}
                           aria-label={`Delete ${acc.name}`}
-                          className="w-8 h-8 rounded-full hover:bg-[#FEE2E2] text-[#717680] hover:text-[#DC2626] flex items-center justify-center transition-colors shrink-0"
+                          className="w-8 h-8 rounded-full hover:bg-[#FEE2E2] dark:hover:bg-[#3A1A1D] text-[#717680] dark:text-[#8E95A5] hover:text-[#DC2626] dark:hover:text-[#F87171] flex items-center justify-center transition-colors shrink-0"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -731,7 +756,7 @@ export function WalletModals({
                     onResetAccountEmpty();
                     onClose();
                   }}
-                  className="px-3.5 h-11 rounded-xl bg-[#EFEFF2] hover:bg-[#E4E5EA] text-[#141416] text-[13px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                  className="px-3.5 h-11 rounded-xl bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] text-[#141416] dark:text-[#F4F5F7] text-[13px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   Empty
@@ -742,22 +767,22 @@ export function WalletModals({
 
           {activeModal === 'dapps' && (
             <div className="space-y-2.5">
-              <p className="text-[12.5px] text-[#717680]">
+              <p className="text-[12.5px] text-[#717680] dark:text-[#8E95A5]">
                 Manage active Web3 browser &amp; WalletConnect sessions for{' '}
-                <strong className="text-[#141416]">{activeAccount.name}</strong>.
+                <strong className="text-[#141416] dark:text-[#F4F5F7]">{activeAccount.name}</strong>.
               </p>
               {dapps.map((dapp) => {
                 const net = NETWORKS.find((n) => n.id === dapp.network);
                 return (
                   <div
                     key={dapp.id}
-                    className="p-3 rounded-2xl border border-[#ECEDF0] flex items-center justify-between gap-2"
+                    className="p-3 rounded-2xl border border-[#ECEDF0] dark:border-[#232836] bg-white dark:bg-[#1A1E29] flex items-center justify-between gap-2"
                   >
                     <div className="min-w-0">
-                      <div className="text-[14px] font-semibold text-[#141416] truncate">
+                      <div className="text-[14px] font-semibold text-[#141416] dark:text-[#F4F5F7] truncate">
                         {dapp.name}
                       </div>
-                      <div className="text-[12px] text-[#717680] truncate">
+                      <div className="text-[12px] text-[#717680] dark:text-[#8E95A5] truncate">
                         {dapp.origin} · {net?.shortName}
                       </div>
                     </div>
@@ -766,8 +791,8 @@ export function WalletModals({
                       onClick={() => onToggleDapp(dapp.id)}
                       className={`px-3 py-1.5 rounded-xl text-[12px] font-semibold transition-colors whitespace-nowrap shrink-0 ${
                         dapp.connected
-                          ? 'bg-[#FEE2E2] text-[#B91C1C] hover:bg-[#FECACA]'
-                          : 'bg-[#EEF0FF] text-[#0500FF] hover:bg-[#E0E4FF]'
+                          ? 'bg-[#FEE2E2] dark:bg-[#3A1A1D] text-[#B91C1C] dark:text-[#F87171] hover:bg-[#FECACA] dark:hover:bg-[#4A2024]'
+                          : 'bg-[#EEF0FF] dark:bg-[#1E2747] text-[#0500FF] dark:text-[#8FA4FF] hover:bg-[#E0E4FF] dark:hover:bg-[#27335C]'
                       }`}
                     >
                       {dapp.connected ? 'Disconnect' : 'Connect'}
@@ -781,18 +806,18 @@ export function WalletModals({
           {activeModal === 'search' && (
             <div className="space-y-3">
               <div className="relative">
-                <Search className="w-4 h-4 text-[#717680] absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-[#717680] dark:text-[#8E95A5] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search token name or symbol..."
                   autoFocus
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[13.5px] text-[#141416] focus:outline-none focus:border-[#0500FF]"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[13.5px] text-[#141416] dark:text-[#F4F5F7] placeholder:text-[#8E939E] dark:placeholder:text-[#6B7280] focus:outline-none focus:border-[#0500FF] dark:focus:border-[#6B85FF]"
                 />
               </div>
 
-              <div className="divide-y divide-[#F1F2F5]">
+              <div className="divide-y divide-[#F1F2F5] dark:divide-[#232836]">
                 {filteredSearchTokens.map((token) => {
                   const starred = watchlistIds.includes(token.id);
                   return (
@@ -804,10 +829,10 @@ export function WalletModals({
                           className="w-8 h-8"
                         />
                         <div className="min-w-0">
-                          <div className="text-[13.5px] font-semibold text-[#141416] truncate">
+                          <div className="text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7] truncate">
                             {token.name}
                           </div>
-                          <div className="text-[11.5px] text-[#717680] tabular-nums">
+                          <div className="text-[11.5px] text-[#717680] dark:text-[#8E95A5] tabular-nums">
                             {token.symbol} · {NETWORKS.find((n) => n.id === token.network)?.shortName ?? token.network} · ${token.priceUsd.toLocaleString('en-US')}
                           </div>
                         </div>
@@ -817,11 +842,11 @@ export function WalletModals({
                           type="button"
                           onClick={() => onToggleWatchlist(token.id)}
                           aria-label={`Toggle watchlist for ${token.symbol}`}
-                          className="p-1.5 rounded-full hover:bg-[#F3F4F6]"
+                          className="p-1.5 rounded-full hover:bg-[#F3F4F6] dark:hover:bg-[#1C202B]"
                         >
                           <Star
                             className={`w-4 h-4 ${
-                              starred ? 'fill-[#F0B90B] text-[#F0B90B]' : 'text-[#9CA3AF]'
+                              starred ? 'fill-[#F0B90B] text-[#F0B90B]' : 'text-[#9CA3AF] dark:text-[#6B7280]'
                             }`}
                           />
                         </button>
@@ -837,7 +862,7 @@ export function WalletModals({
                             );
                             onClose();
                           }}
-                          className="px-2.5 py-1 rounded-lg bg-[#EEF0FF] text-[#0500FF] text-[12px] font-semibold hover:bg-[#E0E4FF]"
+                          className="px-2.5 py-1 rounded-lg bg-[#EEF0FF] dark:bg-[#1E2747] text-[#0500FF] dark:text-[#8FA4FF] text-[12px] font-semibold hover:bg-[#E0E4FF] dark:hover:bg-[#27335C]"
                         >
                           +$100
                         </button>
@@ -862,7 +887,7 @@ export function WalletModals({
                         setShowTxTracker((v) => !v);
                         setTrackError(null);
                       }}
-                      className="text-[12px] font-semibold text-[#0500FF] hover:underline"
+                      className="text-[12px] font-semibold text-[#0500FF] dark:text-[#6B85FF] hover:underline"
                     >
                       {showTxTracker ? 'Hide Tx Tracker' : '+ Track On-Chain Tx Hash'}
                     </button>
@@ -871,10 +896,10 @@ export function WalletModals({
                         type="button"
                         onClick={onRefreshPayments}
                         disabled={isSyncingPayments}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#EFEFF2] hover:bg-[#E4E5EA] text-[12px] font-semibold text-[#141416] transition-colors disabled:opacity-60"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] text-[12px] font-semibold text-[#141416] dark:text-[#F4F5F7] transition-colors disabled:opacity-60"
                       >
                         <RefreshCw
-                          className={`w-3.5 h-3.5 ${isSyncingPayments ? 'animate-spin text-[#0500FF]' : ''}`}
+                          className={`w-3.5 h-3.5 ${isSyncingPayments ? 'animate-spin text-[#0500FF] dark:text-[#6B85FF]' : ''}`}
                         />
                         {isSyncingPayments ? 'Syncing...' : 'Sync On-Chain'}
                       </button>
@@ -882,7 +907,7 @@ export function WalletModals({
                   </div>
 
                   {showTxTracker && onTrackTxHash && (
-                    <div className="p-3 rounded-2xl bg-[#F8F9FB] border border-[#ECEDF0] space-y-2">
+                    <div className="p-3 rounded-2xl bg-[#F8F9FB] dark:bg-[#1A1E29] border border-[#ECEDF0] dark:border-[#232836] space-y-2">
                       <div className="grid grid-cols-2 gap-2">
                         <select
                           value={trackNetwork}
@@ -894,7 +919,7 @@ export function WalletModals({
                               setTrackTokenType(netId === 'bsc' || netId === 'ethereum' || netId === 'tron' ? 'USDT' : info.symbol);
                             }
                           }}
-                          className="px-2.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[12px] font-semibold text-[#141416]"
+                          className="px-2.5 py-2 rounded-xl bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[12px] font-semibold text-[#141416] dark:text-[#F4F5F7]"
                         >
                           {NETWORKS.map((net) => (
                             <option key={net.id} value={net.id}>
@@ -907,7 +932,7 @@ export function WalletModals({
                           value={trackTokenType}
                           onChange={(e) => setTrackTokenType(e.target.value)}
                           placeholder="USDT or NATIVE"
-                          className="px-2.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[12px] font-semibold text-[#141416]"
+                          className="px-2.5 py-2 rounded-xl bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[12px] font-semibold text-[#141416] dark:text-[#F4F5F7]"
                         />
                       </div>
                       <input
@@ -918,10 +943,10 @@ export function WalletModals({
                           setTrackError(null);
                         }}
                         placeholder="Paste real on-chain txHash..."
-                        className="w-full px-2.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[12px] font-mono text-[#141416]"
+                        className="w-full px-2.5 py-2 rounded-xl bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] text-[12px] font-mono text-[#141416] dark:text-[#F4F5F7]"
                       />
                       {trackError && (
-                        <div className="text-[11.5px] font-medium text-[#DC2626]">{trackError}</div>
+                        <div className="text-[11.5px] font-medium text-[#DC2626] dark:text-[#F87171]">{trackError}</div>
                       )}
                       <button
                         type="button"
@@ -947,7 +972,7 @@ export function WalletModals({
                             setTrackSubmitting(false);
                           }
                         }}
-                        className="w-full h-9 rounded-xl bg-[#0500FF] hover:bg-[#0400D6] disabled:bg-[#D1D5DB] text-white text-[12.5px] font-semibold transition-colors"
+                        className="w-full h-9 rounded-xl bg-[#0500FF] hover:bg-[#0400D6] disabled:bg-[#D1D5DB] dark:disabled:bg-[#232836] dark:disabled:text-[#6B7280] text-white text-[12.5px] font-semibold transition-colors"
                       >
                         {trackSubmitting ? 'Checking Blockchain...' : 'Verify & Track Live'}
                       </button>
@@ -956,8 +981,8 @@ export function WalletModals({
 
                   {transactions.length === 0 ? (
                     <div className="py-10 text-center">
-                      <p className="text-[14px] font-semibold text-[#141416]">No transactions yet</p>
-                      <p className="text-[12.5px] text-[#717680] mt-1">
+                      <p className="text-[14px] font-semibold text-[#141416] dark:text-[#F4F5F7]">No transactions yet</p>
+                      <p className="text-[12.5px] text-[#717680] dark:text-[#8E95A5] mt-1">
                         Receive, deposit from Binance, buy, send, or swap crypto to view activity here.
                       </p>
                     </div>
@@ -975,7 +1000,7 @@ export function WalletModals({
                 renderTxReceipt(selectedTx)
               ) : (
                 <>
-                  <div className="p-4 rounded-2xl bg-[#F8F9FB] border border-[#ECEDF0] flex items-center justify-between">
+                  <div className="p-4 rounded-2xl bg-[#F8F9FB] dark:bg-[#1A1E29] border border-[#ECEDF0] dark:border-[#232836] flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <TokenBadgeIcon
                         symbol={detailToken.symbol}
@@ -983,11 +1008,11 @@ export function WalletModals({
                         className="w-10 h-10"
                       />
                       <div>
-                        <div className="text-[20px] font-bold text-[#141416] tabular-nums">
+                        <div className="text-[20px] font-bold text-[#141416] dark:text-[#F4F5F7] tabular-nums">
                           {detailTokenBalance.toLocaleString('en-US', { maximumFractionDigits: 5 })}{' '}
                           {detailToken.symbol}
                         </div>
-                        <div className="text-[12.5px] text-[#717680] tabular-nums">
+                        <div className="text-[12.5px] text-[#717680] dark:text-[#8E95A5] tabular-nums">
                           ≈ $
                           {(detailTokenBalance * detailToken.priceUsd).toLocaleString('en-US', {
                             minimumFractionDigits: 2,
@@ -1005,15 +1030,18 @@ export function WalletModals({
                         setSendTokenId(detailToken.id);
                         onOpenModal('send');
                       }}
-                      className="py-2.5 rounded-xl bg-[#EFEFF2] hover:bg-[#E4E5EA] text-[12.5px] font-semibold text-[#141416] flex items-center justify-center gap-1.5 transition-colors"
+                      className="py-2.5 rounded-xl bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] text-[12.5px] font-semibold text-[#141416] dark:text-[#F4F5F7] flex items-center justify-center gap-1.5 transition-colors"
                     >
                       <Send className="w-3.5 h-3.5" />
                       Send
                     </button>
                     <button
                       type="button"
-                      onClick={() => onOpenModal('receive')}
-                      className="py-2.5 rounded-xl bg-[#EFEFF2] hover:bg-[#E4E5EA] text-[12.5px] font-semibold text-[#141416] flex items-center justify-center gap-1.5 transition-colors"
+                      onClick={() => {
+                        setPendingReceiveNet(detailToken.network);
+                        onOpenModal('receive');
+                      }}
+                      className="py-2.5 rounded-xl bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] text-[12.5px] font-semibold text-[#141416] dark:text-[#F4F5F7] flex items-center justify-center gap-1.5 transition-colors"
                     >
                       <QrCode className="w-3.5 h-3.5" />
                       Receive
@@ -1032,11 +1060,11 @@ export function WalletModals({
                   </div>
 
                   <div>
-                    <div className="text-[13px] font-bold text-[#141416] mb-2">
+                    <div className="text-[13px] font-bold text-[#141416] dark:text-[#F4F5F7] mb-2">
                       {detailToken.symbol} History ({detailTransactions.length})
                     </div>
                     {detailTransactions.length === 0 ? (
-                      <div className="py-6 text-center rounded-2xl border border-[#ECEDF0] text-[12.5px] text-[#717680]">
+                      <div className="py-6 text-center rounded-2xl border border-[#ECEDF0] dark:border-[#232836] text-[12.5px] text-[#717680] dark:text-[#8E95A5]">
                         No transactions recorded for {detailToken.symbol} yet.
                       </div>
                     ) : (
@@ -1051,13 +1079,13 @@ export function WalletModals({
           {activeModal === 'send' && (
             <div className="space-y-3">
               <div>
-                <label className="block text-[12px] font-medium text-[#717680] mb-1">
+                <label className="block text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] mb-1">
                   Asset
                 </label>
                 <select
                   value={sendTokenId}
                   onChange={(e) => setSendTokenId(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[13.5px] font-semibold text-[#141416]"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7]"
                 >
                   {tokens.map((t) => {
                     const bal = activeAccount.balances[t.id] ?? 0;
@@ -1079,7 +1107,7 @@ export function WalletModals({
               </div>
 
               <div>
-                <label className="block text-[12px] font-medium text-[#717680] mb-1">
+                <label className="block text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] mb-1">
                   Recipient Address
                 </label>
                 <input
@@ -1087,19 +1115,19 @@ export function WalletModals({
                   value={sendRecipient}
                   onChange={(e) => setSendRecipient(e.target.value)}
                   placeholder="0x... or wallet address"
-                  className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[12.5px] font-mono text-[#141416] focus:outline-none focus:border-[#0500FF]"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[12.5px] font-mono text-[#141416] dark:text-[#F4F5F7] focus:outline-none focus:border-[#0500FF] dark:focus:border-[#6B85FF]"
                 />
               </div>
 
               <div>
-                <div className="flex items-center justify-between text-[12px] text-[#717680] mb-1">
+                <div className="flex items-center justify-between text-[12px] text-[#717680] dark:text-[#8E95A5] mb-1">
                   <span>Amount ({sendToken.symbol})</span>
                   <div className="flex items-center gap-2">
                     {sendBalance >= 20000 && (
                       <button
                         type="button"
                         onClick={() => setSendAmount('20000')}
-                        className="text-[#0500FF] font-semibold hover:underline"
+                        className="text-[#0500FF] dark:text-[#6B85FF] font-semibold hover:underline"
                       >
                         20,000
                       </button>
@@ -1107,7 +1135,7 @@ export function WalletModals({
                     <button
                       type="button"
                       onClick={() => setSendAmount(String(sendBalance))}
-                      className="text-[#0500FF] font-semibold hover:underline"
+                      className="text-[#0500FF] dark:text-[#6B85FF] font-semibold hover:underline"
                     >
                       Max
                     </button>
@@ -1120,9 +1148,9 @@ export function WalletModals({
                   value={sendAmount}
                   onChange={(e) => setSendAmount(e.target.value)}
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[16px] font-bold text-[#141416] tabular-nums focus:outline-none focus:border-[#0500FF]"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[16px] font-bold text-[#141416] dark:text-[#F4F5F7] tabular-nums focus:outline-none focus:border-[#0500FF] dark:focus:border-[#6B85FF]"
                 />
-                <div className="text-[11.5px] text-[#717680] mt-1 tabular-nums">
+                <div className="text-[11.5px] text-[#717680] dark:text-[#8E95A5] mt-1 tabular-nums">
                   ≈ ${(parsedSendAmount * sendToken.priceUsd).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
               </div>
@@ -1135,7 +1163,7 @@ export function WalletModals({
                   setSendAmount('');
                   onClose();
                 }}
-                className="w-full h-11 rounded-xl bg-[#0500FF] hover:bg-[#0400D6] disabled:bg-[#D1D5DB] disabled:text-[#6B7280] text-white text-[13.5px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                className="w-full h-11 rounded-xl bg-[#0500FF] hover:bg-[#0400D6] disabled:bg-[#D1D5DB] dark:disabled:bg-[#232836] disabled:text-[#6B7280] dark:disabled:text-[#6B7280] text-white text-[13.5px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
               >
                 <Send className="w-4 h-4" />
                 {parsedSendAmount > sendBalance
@@ -1147,19 +1175,54 @@ export function WalletModals({
 
           {activeModal === 'settings' && (
             <div className="space-y-3">
-              <div className="p-3.5 rounded-2xl border border-[#ECEDF0] flex items-center justify-between">
+              <div className="p-3.5 rounded-2xl border border-[#ECEDF0] dark:border-[#232836] bg-white dark:bg-[#1A1E29] flex items-center justify-between gap-2">
                 <div>
-                  <div className="text-[13.5px] font-semibold text-[#141416]">Display Currency</div>
-                  <div className="text-[12px] text-[#717680]">Fiat conversion unit</div>
+                  <div className="text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7]">Appearance</div>
+                  <div className="text-[12px] text-[#717680] dark:text-[#8E95A5]">Day &amp; Night display mode</div>
                 </div>
-                <div className="flex gap-1 bg-[#EFEFF2] p-1 rounded-xl">
+                <div className="flex gap-1 bg-[#EFEFF2] dark:bg-[#14171F] p-1 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => onChangeTheme('light')}
+                    className={`px-2.5 py-1 rounded-lg text-[12px] font-semibold inline-flex items-center gap-1 transition-colors ${
+                      theme === 'light'
+                        ? 'bg-white text-[#141416] shadow-sm'
+                        : 'text-[#717680] dark:text-[#8E95A5]'
+                    }`}
+                  >
+                    <Sun className="w-3.5 h-3.5" />
+                    Day
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onChangeTheme('dark')}
+                    className={`px-2.5 py-1 rounded-lg text-[12px] font-semibold inline-flex items-center gap-1 transition-colors ${
+                      theme === 'dark'
+                        ? 'bg-[#252A38] text-[#F4F5F7] shadow-sm'
+                        : 'text-[#717680] dark:text-[#8E95A5]'
+                    }`}
+                  >
+                    <Moon className="w-3.5 h-3.5" />
+                    Night
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-2xl border border-[#ECEDF0] dark:border-[#232836] bg-white dark:bg-[#1A1E29] flex items-center justify-between">
+                <div>
+                  <div className="text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7]">Display Currency</div>
+                  <div className="text-[12px] text-[#717680] dark:text-[#8E95A5]">Fiat conversion unit</div>
+                </div>
+                <div className="flex gap-1 bg-[#EFEFF2] dark:bg-[#14171F] p-1 rounded-xl">
                   {(['USD', 'EUR'] as const).map((curr) => (
                     <button
                       key={curr}
                       type="button"
                       onClick={() => onChangeCurrency(curr)}
                       className={`px-2.5 py-1 rounded-lg text-[12px] font-semibold transition-colors ${
-                        currency === curr ? 'bg-white text-[#141416] shadow-sm' : 'text-[#717680]'
+                        currency === curr
+                          ? 'bg-white dark:bg-[#252A38] text-[#141416] dark:text-[#F4F5F7] shadow-sm'
+                          : 'text-[#717680] dark:text-[#8E95A5]'
                       }`}
                     >
                       {curr}
@@ -1168,24 +1231,24 @@ export function WalletModals({
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl border border-[#ECEDF0] space-y-2">
+              <div className="p-3.5 rounded-2xl border border-[#ECEDF0] dark:border-[#232836] bg-white dark:bg-[#1A1E29] space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-[#0500FF]" />
-                    <span className="text-[13.5px] font-semibold text-[#141416]">
+                    <Shield className="w-4 h-4 text-[#0500FF] dark:text-[#6B85FF]" />
+                    <span className="text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7]">
                       Security &amp; Seed Backup
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setShowSeedPreview((s) => !s)}
-                    className="text-[12px] font-semibold text-[#0500FF] hover:underline"
+                    className="text-[12px] font-semibold text-[#0500FF] dark:text-[#6B85FF] hover:underline"
                   >
                     {showSeedPreview ? 'Hide' : 'Reveal Demo'}
                   </button>
                 </div>
                 {showSeedPreview && (
-                  <div className="p-2.5 rounded-xl bg-[#F4F5F8] text-[11.5px] font-mono text-[#141416] leading-relaxed">
+                  <div className="p-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#14171F] text-[11.5px] font-mono text-[#141416] dark:text-[#F4F5F7] leading-relaxed">
                     1. harbor 2. velvet 3. orbit 4. kinetic 5. timber 6. canvas 7. prism 8. summit 9. amber 10. signal 11. beacon 12. trust
                   </div>
                 )}
@@ -1196,7 +1259,7 @@ export function WalletModals({
               <button
                 type="button"
                 onClick={() => onOpenModal('admin')}
-                className="w-full h-11 rounded-xl bg-[#EEF0FF] hover:bg-[#E0E4FF] text-[#0500FF] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors"
+                className="w-full h-11 rounded-xl bg-[#EEF0FF] dark:bg-[#1E2747] hover:bg-[#E0E4FF] dark:hover:bg-[#27335C] text-[#0500FF] dark:text-[#8FA4FF] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors"
               >
                 <Lock className="w-4 h-4" />
                 {adminSession ? 'Open Admin Console' : 'Admin Login'}
@@ -1208,7 +1271,7 @@ export function WalletModals({
                   onResetAccountEmpty();
                   onClose();
                 }}
-                className="w-full h-11 rounded-xl bg-[#EFEFF2] hover:bg-[#E4E5EA] text-[#141416] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors"
+                className="w-full h-11 rounded-xl bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38] text-[#141416] dark:text-[#F4F5F7] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
                 Reset {activeAccount.name} to Empty State
@@ -1231,21 +1294,21 @@ export function WalletModals({
 
           {activeModal === 'binance' && (
             <div className="space-y-3">
-              <div className="p-3 rounded-2xl bg-[#FFFBEB] border border-[#FDE68A] flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-[#FFFBEB] dark:bg-[#2B2310] border border-[#FDE68A] dark:border-[#5C4716] flex items-center gap-3">
                 <BinanceIcon className="w-7 h-7 shrink-0" />
-                <p className="text-[12.5px] text-[#78350F]">
+                <p className="text-[12.5px] text-[#78350F] dark:text-[#FCD34D]">
                   Transfer funds directly from your Binance account with zero manual address entry.
                 </p>
               </div>
 
               <div>
-                <label className="block text-[12px] font-medium text-[#717680] mb-1">
+                <label className="block text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] mb-1">
                   Asset to Deposit
                 </label>
                 <select
                   value={binanceTokenId}
                   onChange={(e) => setBinanceTokenId(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[13.5px] font-semibold text-[#141416]"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7]"
                 >
                   {tokens.map((t) => (
                     <option key={t.id} value={t.id}>
@@ -1256,7 +1319,7 @@ export function WalletModals({
               </div>
 
               <div>
-                <label className="block text-[12px] font-medium text-[#717680] mb-1">
+                <label className="block text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] mb-1">
                   Amount ({selectedBinanceToken.symbol})
                 </label>
                 <input
@@ -1265,7 +1328,7 @@ export function WalletModals({
                   min="0"
                   value={binanceAmount}
                   onChange={(e) => setBinanceAmount(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[15px] font-bold text-[#141416] tabular-nums focus:outline-none focus:border-[#0500FF]"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[15px] font-bold text-[#141416] dark:text-[#F4F5F7] tabular-nums focus:outline-none focus:border-[#0500FF] dark:focus:border-[#6B85FF]"
                 />
               </div>
 
@@ -1300,7 +1363,7 @@ export function WalletModals({
                     className={`py-2 rounded-xl text-[13px] font-semibold tabular-nums transition-colors ${
                       buyUsdAmount === amt
                         ? 'bg-[#0500FF] text-white'
-                        : 'bg-[#EFEFF2] text-[#141416] hover:bg-[#E4E5EA]'
+                        : 'bg-[#EFEFF2] dark:bg-[#1C202B] text-[#141416] dark:text-[#F4F5F7] hover:bg-[#E4E5EA] dark:hover:bg-[#252A38]'
                     }`}
                   >
                     ${amt}
@@ -1310,7 +1373,7 @@ export function WalletModals({
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="block text-[12px] font-medium text-[#717680] mb-1">
+                  <label className="block text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] mb-1">
                     Amount (USD)
                   </label>
                   <input
@@ -1318,17 +1381,17 @@ export function WalletModals({
                     min="10"
                     value={buyUsdAmount}
                     onChange={(e) => setBuyUsdAmount(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[14px] font-bold text-[#141416] tabular-nums"
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[14px] font-bold text-[#141416] dark:text-[#F4F5F7] tabular-nums"
                   />
                 </div>
                 <div>
-                  <label className="block text-[12px] font-medium text-[#717680] mb-1">
+                  <label className="block text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] mb-1">
                     Token
                   </label>
                   <select
                     value={buyTokenId}
                     onChange={(e) => setBuyTokenId(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] border border-[#E5E7EB] text-[14px] font-bold text-[#141416]"
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#F4F5F8] dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[14px] font-bold text-[#141416] dark:text-[#F4F5F7]"
                   >
                     {tokens.map((t) => (
                       <option key={t.id} value={t.id}>
@@ -1346,7 +1409,7 @@ export function WalletModals({
               </div>
 
               <div>
-                <label className="block text-[12px] font-medium text-[#717680] mb-1">
+                <label className="block text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] mb-1">
                   Payment Provider
                 </label>
                 <div className="grid grid-cols-3 gap-1.5">
@@ -1357,8 +1420,8 @@ export function WalletModals({
                       onClick={() => setBuyProvider(prov)}
                       className={`py-2 rounded-xl text-[12.5px] font-semibold border transition-colors ${
                         buyProvider === prov
-                          ? 'border-[#0500FF] bg-[#EEF0FF] text-[#0500FF]'
-                          : 'border-[#ECEDF0] bg-white text-[#525866]'
+                          ? 'border-[#0500FF] dark:border-[#6B85FF] bg-[#EEF0FF] dark:bg-[#1E2747] text-[#0500FF] dark:text-[#8FA4FF]'
+                          : 'border-[#ECEDF0] dark:border-[#232836] bg-white dark:bg-[#1A1E29] text-[#525866] dark:text-[#8E95A5]'
                       }`}
                     >
                       {prov}
@@ -1367,9 +1430,9 @@ export function WalletModals({
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#F8F9FB] border border-[#ECEDF0] flex items-center justify-between text-[12.5px]">
-                <span className="text-[#717680]">You receive est.</span>
-                <strong className="text-[#141416] tabular-nums">
+              <div className="p-3 rounded-xl bg-[#F8F9FB] dark:bg-[#1A1E29] border border-[#ECEDF0] dark:border-[#232836] flex items-center justify-between text-[12.5px]">
+                <span className="text-[#717680] dark:text-[#8E95A5]">You receive est.</span>
+                <strong className="text-[#141416] dark:text-[#F4F5F7] tabular-nums">
                   {estimatedBuyQty.toFixed(5)} {selectedBuyToken.symbol}
                 </strong>
               </div>
@@ -1404,8 +1467,8 @@ export function WalletModals({
                 }}
                 className={`w-full px-3.5 py-3 rounded-xl flex items-center justify-between text-[13.5px] font-semibold transition-colors ${
                   selectedNetwork === 'all'
-                    ? 'bg-[#EEF0FF] text-[#0500FF]'
-                    : 'hover:bg-[#F8F9FB] text-[#141416]'
+                    ? 'bg-[#EEF0FF] dark:bg-[#1E2747] text-[#0500FF] dark:text-[#8FA4FF]'
+                    : 'hover:bg-[#F8F9FB] dark:hover:bg-[#1C202B] text-[#141416] dark:text-[#F4F5F7]'
                 }`}
               >
                 <span>All Networks</span>
@@ -1423,8 +1486,8 @@ export function WalletModals({
                     }}
                     className={`w-full px-3.5 py-3 rounded-xl flex items-center justify-between text-[13.5px] font-semibold transition-colors ${
                       active
-                        ? 'bg-[#EEF0FF] text-[#0500FF]'
-                        : 'hover:bg-[#F8F9FB] text-[#141416]'
+                        ? 'bg-[#EEF0FF] dark:bg-[#1E2747] text-[#0500FF] dark:text-[#8FA4FF]'
+                        : 'hover:bg-[#F8F9FB] dark:hover:bg-[#1C202B] text-[#141416] dark:text-[#F4F5F7]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
@@ -1439,7 +1502,7 @@ export function WalletModals({
           )}
 
           {activeModal === 'manage' && (
-            <div className="divide-y divide-[#F1F2F5]">
+            <div className="divide-y divide-[#F1F2F5] dark:divide-[#232836]">
               {tokens.map((token) => {
                 const enabled = activeAccount.enabledTokenIds.includes(token.id);
                 return (
@@ -1451,10 +1514,10 @@ export function WalletModals({
                         className="w-8 h-8"
                       />
                       <div>
-                        <div className="text-[13.5px] font-semibold text-[#141416]">
+                        <div className="text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7]">
                           {token.symbol}
                         </div>
-                        <div className="text-[11.5px] text-[#717680]">{token.name}</div>
+                        <div className="text-[11.5px] text-[#717680] dark:text-[#8E95A5]">{token.name}</div>
                       </div>
                     </div>
                     <button
@@ -1463,7 +1526,7 @@ export function WalletModals({
                       aria-checked={enabled}
                       onClick={() => onToggleTokenEnabled(token.id)}
                       className={`w-11 h-6 rounded-full p-0.5 transition-colors ${
-                        enabled ? 'bg-[#0500FF]' : 'bg-[#D1D5DB]'
+                        enabled ? 'bg-[#0500FF]' : 'bg-[#D1D5DB] dark:bg-[#2D3343]'
                       }`}
                     >
                       <span

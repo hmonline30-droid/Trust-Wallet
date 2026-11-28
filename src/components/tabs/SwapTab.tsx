@@ -47,13 +47,13 @@ export function SwapTab({ account, tokens, onExecuteSwap, onOpenBuy }: SwapTabPr
     <div className="p-4 flex flex-col flex-1">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h2 className="text-[18px] font-bold text-[#141416] tracking-tight">Swap</h2>
-          <p className="text-[12px] text-[#717680]">Cross-chain DEX aggregator</p>
+          <h2 className="text-[18px] font-bold text-[#141416] dark:text-[#F4F5F7] tracking-tight">Swap</h2>
+          <p className="text-[12px] text-[#717680] dark:text-[#8E95A5]">Cross-chain DEX aggregator</p>
         </div>
         <button
           type="button"
           onClick={() => setShowSlippage((v) => !v)}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#EFEFF2] hover:bg-[#E5E6EB] text-[12px] font-semibold text-[#141416] transition-colors"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#EFEFF2] dark:bg-[#1C202B] hover:bg-[#E5E6EB] dark:hover:bg-[#252A38] text-[12px] font-semibold text-[#141416] dark:text-[#F4F5F7] transition-colors"
         >
           <SlidersHorizontal className="w-3.5 h-3.5" />
           <span className="tabular-nums">{slippage}%</span>
@@ -61,8 +61,8 @@ export function SwapTab({ account, tokens, onExecuteSwap, onOpenBuy }: SwapTabPr
       </div>
 
       {showSlippage && (
-        <div className="mb-3 p-3 rounded-2xl bg-[#F7F8FA] border border-[#ECEDF0] flex items-center justify-between gap-2">
-          <span className="text-[12px] font-medium text-[#525866]">Max Slippage</span>
+        <div className="mb-3 p-3 rounded-2xl bg-[#F7F8FA] dark:bg-[#1A1E29] border border-[#ECEDF0] dark:border-[#232836] flex items-center justify-between gap-2">
+          <span className="text-[12px] font-medium text-[#525866] dark:text-[#9CA3AF]">Max Slippage</span>
           <div className="flex items-center gap-1.5">
             {[0.1, 0.5, 1.0].map((val) => (
               <button
@@ -72,7 +72,7 @@ export function SwapTab({ account, tokens, onExecuteSwap, onOpenBuy }: SwapTabPr
                 className={`px-2.5 py-1 rounded-lg text-[12px] font-semibold tabular-nums transition-colors ${
                   slippage === val
                     ? 'bg-[#0500FF] text-white'
-                    : 'bg-white border border-[#E5E7EB] text-[#141416]'
+                    : 'bg-white dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] text-[#141416] dark:text-[#F4F5F7]'
                 }`}
               >
                 {val}%
@@ -84,19 +84,19 @@ export function SwapTab({ account, tokens, onExecuteSwap, onOpenBuy }: SwapTabPr
 
       <form onSubmit={handleSwapSubmit} className="space-y-2 relative">
         {/* From Card */}
-        <div className="p-3.5 rounded-2xl bg-[#F4F5F8] border border-[#ECEDF0]">
-          <div className="flex items-center justify-between text-[12px] text-[#717680] mb-2">
+        <div className="p-3.5 rounded-2xl bg-[#F4F5F8] dark:bg-[#1A1E29] border border-[#ECEDF0] dark:border-[#232836]">
+          <div className="flex items-center justify-between text-[12px] text-[#717680] dark:text-[#8E95A5] mb-2">
             <span>From</span>
             <button
               type="button"
               onClick={() => setFromAmountStr(fromBalance > 0 ? String(fromBalance) : '0')}
-              className="tabular-nums hover:text-[#0500FF] transition-colors"
+              className="tabular-nums hover:text-[#0500FF] dark:hover:text-[#6B85FF] transition-colors"
             >
               Balance: {fromBalance.toLocaleString('en-US', { maximumFractionDigits: 5 })} {fromToken.symbol}
             </button>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 shrink-0">
+            <div className="flex items-center gap-2 bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] rounded-xl px-2.5 py-1.5 shrink-0">
               <TokenBadgeIcon
                 symbol={fromToken.symbol}
                 networkId={fromToken.network}
@@ -111,7 +111,7 @@ export function SwapTab({ account, tokens, onExecuteSwap, onOpenBuy }: SwapTabPr
                   setSwapSuccess(null);
                 }}
                 aria-label="Select source token"
-                className="text-[14px] font-bold text-[#141416] bg-transparent focus:outline-none cursor-pointer"
+                className="text-[14px] font-bold text-[#141416] dark:text-[#F4F5F7] dark:bg-[#14171F] bg-transparent focus:outline-none cursor-pointer"
               >
                 {tokens.map((t) => (
                   <option key={t.id} value={t.id}>
@@ -131,10 +131,10 @@ export function SwapTab({ account, tokens, onExecuteSwap, onOpenBuy }: SwapTabPr
                 setSwapSuccess(null);
               }}
               placeholder="0.00"
-              className="w-full text-right text-[22px] font-bold text-[#141416] bg-transparent focus:outline-none tabular-nums"
+              className="w-full text-right text-[22px] font-bold text-[#141416] dark:text-[#F4F5F7] bg-transparent focus:outline-none tabular-nums"
             />
           </div>
-          <div className="text-right text-[11.5px] text-[#717680] mt-1 tabular-nums">
+          <div className="text-right text-[11.5px] text-[#717680] dark:text-[#8E95A5] mt-1 tabular-nums">
             ≈ ${(parsedFrom * fromToken.priceUsd).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
         </div>
@@ -145,22 +145,22 @@ export function SwapTab({ account, tokens, onExecuteSwap, onOpenBuy }: SwapTabPr
             type="button"
             onClick={handleFlip}
             aria-label="Switch swap direction"
-            className="w-9 h-9 rounded-full bg-white border border-[#E5E7EB] shadow-sm flex items-center justify-center text-[#141416] hover:text-[#0500FF] hover:border-[#0500FF]/40 transition-colors"
+            className="w-9 h-9 rounded-full bg-white dark:bg-[#1C202B] border border-[#E5E7EB] dark:border-[#2D3343] shadow-sm flex items-center justify-center text-[#141416] dark:text-[#F4F5F7] hover:text-[#0500FF] dark:hover:text-[#6B85FF] hover:border-[#0500FF]/40 transition-colors"
           >
             <ArrowUpDown className="w-4 h-4" />
           </button>
         </div>
 
         {/* To Card */}
-        <div className="p-3.5 rounded-2xl bg-[#F4F5F8] border border-[#ECEDF0]">
-          <div className="flex items-center justify-between text-[12px] text-[#717680] mb-2">
+        <div className="p-3.5 rounded-2xl bg-[#F4F5F8] dark:bg-[#1A1E29] border border-[#ECEDF0] dark:border-[#232836]">
+          <div className="flex items-center justify-between text-[12px] text-[#717680] dark:text-[#8E95A5] mb-2">
             <span>To (estimated)</span>
             <span className="tabular-nums">
               Balance: {toBalance.toLocaleString('en-US', { maximumFractionDigits: 5 })} {toToken.symbol}
             </span>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 shrink-0">
+            <div className="flex items-center gap-2 bg-white dark:bg-[#14171F] border border-[#E5E7EB] dark:border-[#2D3343] rounded-xl px-2.5 py-1.5 shrink-0">
               <TokenBadgeIcon
                 symbol={toToken.symbol}
                 networkId={toToken.network}
@@ -175,7 +175,7 @@ export function SwapTab({ account, tokens, onExecuteSwap, onOpenBuy }: SwapTabPr
                   setSwapSuccess(null);
                 }}
                 aria-label="Select destination token"
-                className="text-[14px] font-bold text-[#141416] bg-transparent focus:outline-none cursor-pointer"
+                className="text-[14px] font-bold text-[#141416] dark:text-[#F4F5F7] dark:bg-[#14171F] bg-transparent focus:outline-none cursor-pointer"
               >
                 {tokens.map((t) => (
                   <option key={t.id} value={t.id}>
@@ -185,17 +185,17 @@ export function SwapTab({ account, tokens, onExecuteSwap, onOpenBuy }: SwapTabPr
               </select>
             </div>
 
-            <div className="text-right text-[22px] font-bold text-[#141416] tabular-nums truncate">
+            <div className="text-right text-[22px] font-bold text-[#141416] dark:text-[#F4F5F7] tabular-nums truncate">
               {estimatedTo > 0 ? estimatedTo.toFixed(5) : '0.00'}
             </div>
           </div>
-          <div className="text-right text-[11.5px] text-[#717680] mt-1 tabular-nums">
+          <div className="text-right text-[11.5px] text-[#717680] dark:text-[#8E95A5] mt-1 tabular-nums">
             1 {fromToken.symbol} = {rate.toFixed(5)} {toToken.symbol}
           </div>
         </div>
 
         {swapSuccess && (
-          <div className="p-3 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] text-[12.5px] font-medium flex items-center gap-2">
+          <div className="p-3 rounded-xl bg-[#ECFDF5] dark:bg-[#052E16] border border-[#A7F3D0] dark:border-[#166534] text-[#065F46] dark:text-[#86EFAC] text-[12.5px] font-medium flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{swapSuccess}</span>
           </div>
@@ -214,7 +214,7 @@ export function SwapTab({ account, tokens, onExecuteSwap, onOpenBuy }: SwapTabPr
             <button
               type="submit"
               disabled={insufficientBalance}
-              className="w-full h-12 rounded-2xl bg-[#0500FF] hover:bg-[#0400D6] disabled:bg-[#D1D5DB] disabled:text-[#6B7280] text-white text-[14px] font-semibold transition-colors"
+              className="w-full h-12 rounded-2xl bg-[#0500FF] hover:bg-[#0400D6] disabled:bg-[#D1D5DB] dark:disabled:bg-[#232836] disabled:text-[#6B7280] dark:disabled:text-[#64748B] text-white text-[14px] font-semibold transition-colors"
             >
               {parsedFrom > fromBalance
                 ? `Insufficient ${fromToken.symbol} balance`

@@ -52,14 +52,14 @@ export function TrendingTab({
 
   return (
     <div className="flex flex-col flex-1">
-      <div className="px-4 pt-3 pb-3 border-b border-[#ECEDF0]">
+      <div className="px-4 pt-3 pb-3 border-b border-[#ECEDF0] dark:border-[#232836]">
         <div className="flex items-center gap-2">
-          <Flame className="w-4 h-4 text-[#0500FF]" />
-          <h2 className="text-[18px] font-bold text-[#141416] tracking-tight">
+          <Flame className="w-4 h-4 text-[#0500FF] dark:text-[#6B85FF]" />
+          <h2 className="text-[18px] font-bold text-[#141416] dark:text-[#F4F5F7] tracking-tight">
             Trending Markets
           </h2>
         </div>
-        <p className="text-[12.5px] text-[#717680] mt-0.5">
+        <p className="text-[12.5px] text-[#717680] dark:text-[#8E95A5] mt-0.5">
           Top 24h movers across Ethereum, BSC, Solana &amp; Bitcoin
         </p>
 
@@ -74,7 +74,7 @@ export function TrendingTab({
                 className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold whitespace-nowrap shrink-0 transition-colors ${
                   active
                     ? 'bg-[#0500FF] text-white'
-                    : 'bg-[#EFEFF2] text-[#525866] hover:text-[#141416]'
+                    : 'bg-[#EFEFF2] dark:bg-[#1C202B] text-[#525866] dark:text-[#9CA3AF] hover:text-[#141416] dark:hover:text-[#F4F5F7]'
                 }`}
               >
                 {cat}
@@ -84,17 +84,17 @@ export function TrendingTab({
         </div>
       </div>
 
-      <div className="divide-y divide-[#F1F2F5]">
+      <div className="divide-y divide-[#F1F2F5] dark:divide-[#232836]">
         {filtered.map((token, idx) => {
           const isPos = token.change24h >= 0;
           const isStarred = watchlistIds.includes(token.id);
           return (
             <div
               key={token.id}
-              className="px-4 py-3 flex items-center justify-between gap-2 hover:bg-[#F8F9FB] transition-colors"
+              className="px-4 py-3 flex items-center justify-between gap-2 hover:bg-[#F8F9FB] dark:hover:bg-[#1C202B] transition-colors"
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <span className="w-4 text-[12px] font-medium text-[#717680] tabular-nums shrink-0">
+                <span className="w-4 text-[12px] font-medium text-[#717680] dark:text-[#8E95A5] tabular-nums shrink-0">
                   {idx + 1}
                 </span>
                 <TokenBadgeIcon
@@ -103,10 +103,10 @@ export function TrendingTab({
                   className="w-8 h-8"
                 />
                 <div className="min-w-0">
-                  <div className="text-[13.5px] font-semibold text-[#141416] truncate">
+                  <div className="text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7] truncate">
                     {token.symbol}
                   </div>
-                  <div className="text-[11.5px] text-[#717680] truncate">
+                  <div className="text-[11.5px] text-[#717680] dark:text-[#8E95A5] truncate">
                     MCap {token.marketCap}
                   </div>
                 </div>
@@ -118,12 +118,12 @@ export function TrendingTab({
 
               <div className="flex items-center gap-2 shrink-0">
                 <div className="text-right tabular-nums">
-                  <div className="text-[13.5px] font-semibold text-[#141416]">
+                  <div className="text-[13.5px] font-semibold text-[#141416] dark:text-[#F4F5F7]">
                     ${token.priceUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div
                     className={`text-[11.5px] font-medium flex items-center justify-end gap-0.5 ${
-                      isPos ? 'text-[#16A34A]' : 'text-[#DC2626]'
+                      isPos ? 'text-[#16A34A] dark:text-[#4ADE80]' : 'text-[#DC2626] dark:text-[#F87171]'
                     }`}
                   >
                     {isPos ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownLeft className="w-3 h-3" />}
@@ -136,7 +136,7 @@ export function TrendingTab({
                   type="button"
                   onClick={() => toggleWatchlist(token.id)}
                   aria-label={isStarred ? `Unstar ${token.symbol}` : `Star ${token.symbol}`}
-                  className="p-1.5 rounded-full hover:bg-[#EFEFF2] transition-colors"
+                  className="p-1.5 rounded-full hover:bg-[#EFEFF2] dark:hover:bg-[#252A38] transition-colors"
                 >
                   <Star
                     className={`w-4 h-4 ${
@@ -148,7 +148,7 @@ export function TrendingTab({
                 <button
                   type="button"
                   onClick={() => onQuickBuyToken(token.id)}
-                  className="px-2.5 py-1.5 rounded-lg bg-[#EEF0FF] text-[#0500FF] text-[12px] font-semibold hover:bg-[#E0E4FF] transition-colors whitespace-nowrap"
+                  className="px-2.5 py-1.5 rounded-lg bg-[#EEF0FF] dark:bg-[#1E2747] text-[#0500FF] dark:text-[#8FA4FF] text-[12px] font-semibold hover:bg-[#E0E4FF] dark:hover:bg-[#27335D] transition-colors whitespace-nowrap"
                 >
                   Buy
                 </button>
